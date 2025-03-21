@@ -11,6 +11,11 @@ message(STATUS "CPU_DISPATCH : ${CPU_DISPATCH}")
 # INITIAL SETUPS
 # ------------------------------------------------------------------
 
+if(NOT DEFINED BUILD_SHARED_LIBS)
+    # default to static if not specified
+    set(BUILD_SHARED_LIBS OFF)
+endif()
+
 if(MSVC)
     if(BUILD_SHARED_LIBS)
         set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
@@ -26,6 +31,15 @@ if(MSVC)
     )
 
     message(STATUS "CONFIG=${CONFIG}")
+endif()
+
+if(APPLE)    
+    if(BUILD_SHARED_LIBS)
+        set(CMAKE_MACOSX_RPATH ON)
+        set(CMAKE_INSTALL_NAME_DIR @rpath)
+        set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+        set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
+    endif()
 endif()
 
 # ------------------------------------------------------------------
