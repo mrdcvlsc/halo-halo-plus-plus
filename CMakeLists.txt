@@ -11,10 +11,9 @@ message(STATUS "CPU_DISPATCH : ${CPU_DISPATCH}")
 # INITIAL SETUPS
 # ------------------------------------------------------------------
 
-if(NOT DEFINED BUILD_SHARED_LIBS)
-    # default to static if not specified
-    set(BUILD_SHARED_LIBS OFF)
-endif()
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_CXX_STANDARD 17)
 
 if(MSVC)
     if(BUILD_SHARED_LIBS)
@@ -58,10 +57,6 @@ FetchContent_MakeAvailable(SFML)
 # ------------------------------------------------------------------
 # OpenCV
 # ------------------------------------------------------------------
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_VERBOSE_MAKEFILE ON)
-set(CMAKE_CXX_STANDARD 17)
 
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
@@ -132,12 +127,14 @@ target_link_libraries(live_cam_object_detection PRIVATE ${OpenCV_LIBS})
 target_link_libraries(live_cam_object_detection PRIVATE SFML::Audio)
 
 if (MSVC)
-file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
-  add_custom_command(TARGET live_cam_object_detection
-                      POST_BUILD
-                      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                      ${TORCH_DLLS}
-                      $<TARGET_FILE_DIR:live_cam_object_detection>)
+    if(BUILD_SHARED_LIBS)
+        file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
+        add_custom_command(TARGET live_cam_object_detection
+                            POST_BUILD
+                            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                            ${TORCH_DLLS}
+                            $<TARGET_FILE_DIR:live_cam_object_detection>)
+    endif(BUILD_SHARED_LIBS)
 endif (MSVC)
 
 # ------------------------------------------------------------------
@@ -152,12 +149,14 @@ target_link_libraries(live_cam_motion_detection PRIVATE ${OpenCV_LIBS})
 target_link_libraries(live_cam_motion_detection PRIVATE SFML::Audio)
 
 # if (MSVC)
-# file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
-#   add_custom_command(TARGET live_cam_motion_detection
-#                       POST_BUILD
-#                       COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#                       ${TORCH_DLLS}
-#                       $<TARGET_FILE_DIR:live_cam_motion_detection>)
+#     if(BUILD_SHARED_LIBS)
+#         file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
+#         add_custom_command(TARGET live_cam_object_detection
+#                             POST_BUILD
+#                             COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#                             ${TORCH_DLLS}
+#                             $<TARGET_FILE_DIR:live_cam_object_detection>)
+#     endif(BUILD_SHARED_LIBS)
 # endif (MSVC)
 
 
@@ -172,10 +171,12 @@ target_link_libraries(draw_bounding_box PRIVATE "${TORCH_LIBRARIES}")
 target_link_libraries(draw_bounding_box PRIVATE ${OpenCV_LIBS})
 
 if (MSVC)
-file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
-  add_custom_command(TARGET draw_bounding_box
-                      POST_BUILD
-                      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                      ${TORCH_DLLS}
-                      $<TARGET_FILE_DIR:draw_bounding_box>)
+    if(BUILD_SHARED_LIBS)
+        file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
+        add_custom_command(TARGET live_cam_object_detection
+                            POST_BUILD
+                            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                            ${TORCH_DLLS}
+                            $<TARGET_FILE_DIR:live_cam_object_detection>)
+    endif(BUILD_SHARED_LIBS)
 endif (MSVC)
