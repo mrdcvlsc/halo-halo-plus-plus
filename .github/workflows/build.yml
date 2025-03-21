@@ -77,7 +77,7 @@ jobs:
 
     - name: Install MacOS Dependencies
       if: runner.os == 'macOS'
-      run: brew install opencv
+      run: brew install opencv tree
 
     - name: Configure project
       run: cmake -S . -B build -DCMAKE_INSTALL_PREFIX=install -DOpenCV_DIR="opencv-4.11.0/build/install" ${{matrix.platform.flags}} ${{matrix.config.flags}} ${{matrix.build.flags}}
