@@ -127,7 +127,6 @@ target_link_libraries(live_cam_object_detection PRIVATE ${OpenCV_LIBS})
 target_link_libraries(live_cam_object_detection PRIVATE SFML::Audio)
 set_property(TARGET live_cam_object_detection PROPERTY CXX_STANDARD 17)
 
-
 if (MSVC)
     if(BUILD_SHARED_LIBS)
         file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
@@ -162,7 +161,6 @@ set_property(TARGET live_cam_motion_detection PROPERTY CXX_STANDARD 17)
 #     endif(BUILD_SHARED_LIBS)
 # endif (MSVC)
 
-
 # ------------------------------------------------------------------
 # draw_bounding_box (OpenCV + libtorch)
 
@@ -173,7 +171,6 @@ target_link_libraries(draw_bounding_box PRIVATE "${TORCH_LIBRARIES}")
 # link all opencv library modules
 target_link_libraries(draw_bounding_box PRIVATE ${OpenCV_LIBS})
 set_property(TARGET draw_bounding_box PROPERTY CXX_STANDARD 17)
-
 
 if (MSVC)
     if(BUILD_SHARED_LIBS)
