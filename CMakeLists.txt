@@ -127,15 +127,16 @@ target_link_libraries(live_cam_object_detection PRIVATE ${OpenCV_LIBS})
 target_link_libraries(live_cam_object_detection PRIVATE SFML::Audio)
 set_property(TARGET live_cam_object_detection PROPERTY CXX_STANDARD 17)
 
+
 if (MSVC)
-    if(BUILD_SHARED_LIBS)
-        file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
-        add_custom_command(TARGET live_cam_object_detection
-                            POST_BUILD
-                            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                            ${TORCH_DLLS}
-                            $<TARGET_FILE_DIR:live_cam_object_detection>)
-    endif(BUILD_SHARED_LIBS)
+    # the official libtorch libraries are shared libs so we need to
+    # accomodate that despite our other library builds are static
+    file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
+    add_custom_command(TARGET live_cam_object_detection
+                        POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                        ${TORCH_DLLS}
+                        $<TARGET_FILE_DIR:live_cam_object_detection>)
 endif (MSVC)
 
 # ------------------------------------------------------------------
@@ -151,14 +152,14 @@ target_link_libraries(live_cam_motion_detection PRIVATE SFML::Audio)
 set_property(TARGET live_cam_motion_detection PROPERTY CXX_STANDARD 17)
 
 # if (MSVC)
-#     if(BUILD_SHARED_LIBS)
-#         file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
-#         add_custom_command(TARGET live_cam_motion_detection
+      # the official libtorch libraries are shared libs so we need to
+      # accomodate that despite our other library builds are static
+#     file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
+#     add_custom_command(TARGET live_cam_motion_detection
 #                             POST_BUILD
 #                             COMMAND ${CMAKE_COMMAND} -E copy_if_different
 #                             ${TORCH_DLLS}
 #                             $<TARGET_FILE_DIR:live_cam_motion_detection>)
-#     endif(BUILD_SHARED_LIBS)
 # endif (MSVC)
 
 # ------------------------------------------------------------------
@@ -173,12 +174,12 @@ target_link_libraries(draw_bounding_box PRIVATE ${OpenCV_LIBS})
 set_property(TARGET draw_bounding_box PROPERTY CXX_STANDARD 17)
 
 if (MSVC)
-    if(BUILD_SHARED_LIBS)
-        file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
-        add_custom_command(TARGET draw_bounding_box
+    # the official libtorch libraries are shared libs so we need to
+    # accomodate that despite our other library builds are static
+    file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
+    add_custom_command(TARGET draw_bounding_box
                             POST_BUILD
                             COMMAND ${CMAKE_COMMAND} -E copy_if_different
                             ${TORCH_DLLS}
                             $<TARGET_FILE_DIR:draw_bounding_box>)
-    endif(BUILD_SHARED_LIBS)
 endif (MSVC)
