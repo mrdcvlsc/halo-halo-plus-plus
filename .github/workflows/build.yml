@@ -1,0 +1,97 @@
+name: build
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches: [ main ]
+
+jobs:
+  build:
+    permissions: write-all
+
+    name: ${{ matrix.platform.name }} ${{ matrix.config.name }}
+    runs-on: ${{ matrix.platform.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+        # - { name: Windows VS2022-shared, os: windows-2022,   folder: .\\build\\bin\\Release, zip: windows-VS22.zip,  zipper: 7z a -tzip, flags: -G "Visual Studio 17 2022" -A x64 }
+        - { name: Windows VS2019, os: windows-2019,   folder: .\\build\\bin\\Release, zip: windows-VS19.zip,  zipper: 7z a -tzip, flags: -G "Visual Studio 16 2019" -A x64 }
+        - { name: Windows VS2022, os: windows-2022,   folder: .\\build\\bin\\Release, zip: windows-VS22.zip,  zipper: 7z a -tzip, flags: -G "Visual Studio 17 2022" -A x64 }
+        - { name: Windows Clang,  os: windows-latest, folder: .\\build\\bin,          zip: windows-clang.zip, zipper: 7z a -tzip, flags: -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCPU_BASELINE=SSE3 -DCPU_DISPATCH= }
+        - { name: Windows GCC,    os: windows-latest, folder: .\\build\\bin,          zip: windows-gcc.zip,   zipper: 7z a -tzip, flags: -G "Unix Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++       }
+        - { name: MacOS XCode,    os: macos-latest,   folder: ./build/bin,            zip: mac.zip,           zipper: zip }
+        - { name: Linux GCC,      os: ubuntu-latest,  folder: ./build/bin,            zip: ubuntu-gcc.zip,    zipper: zip -r }
+        - { name: Linux Clang,    os: ubuntu-latest,  folder: ./build/bin,            zip: ubuntu-clang.zip,  zipper: zip -r,     flags: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ }
+        config:
+        - { name: static, flags: -DBUILD_SHARED_LIBS=FALSE }
+        # - { name: shared, flags: -DBUILD_SHARED_LIBS=TRUE }
+        build:
+        - { name: Release,        flags: -DCMAKE_BUILD_TYPE=Release }
+        # - { name: Debug,          flags: -DCMAKE_BUILD_TYPE=Debug }
+        # - { name: RelWithDebInfo, flags: -DCMAKE_BUILD_TYPE=RelWithDebInfo }
+        # - { name: MinSizeRel,     flags: -DCMAKE_BUILD_TYPE=MinSizeRel }
+
+    steps:
+
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Install Linux Dependencies
+      if: runner.os == 'Linux'
+      run: sudo apt install libopencv-dev
+
+    - name: Download OpenCV and Extract sources
+      if: runner.os == 'Windows'
+      run: |
+        curl -L -o 4.11.0.zip https://github.com/opencv/opencv/archive/refs/tags/4.11.0.zip
+        tar -xf "4.11.0.zip" -C ".\"
+       
+    - name: CMake Config OpenCV (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        cd opencv-4.11.0
+        cmake -S . -B build ${{matrix.platform.flags}} ${{matrix.config.flags}} ${{matrix.build.flags}} -DCMAKE_INSTALL_PREFIX="build/install" -DBUILD_PERF_TESTS=OFF -DBUILD_TESTS=OFF -DBUILD_DOCS=OFF  -DWITH_CUDA=OFF -DBUILD_EXAMPLES=OFF -DINSTALL_CREATE_DISTRIB=ON
+
+    - name: CMake Build OpenCV (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        cd opencv-4.11.0
+        cmake --build build --config Release
+
+    - name: CMake Install OpenCV (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        cd opencv-4.11.0
+        cmake --build build --target install --config Release
+
+    - name: Verify OpenCV Installation
+      if: runner.os == 'Windows'
+      run: dir opencv-4.11.0\build\install
+
+    - name: Install MacOS Dependencies
+      if: runner.os == 'macOS'
+      run: brew install opencv
+
+    - name: Configure project
+      run: cmake -S . -B build -DOpenCV_DIR="opencv-4.11.0/build/install" ${{matrix.platform.flags}} ${{matrix.config.flags}} ${{matrix.build.flags}}
+
+    - name: Build ${{matrix.platform.bin}} executable
+      run: cmake --build build --config ${{matrix.build.name}}
+
+    - name: Compress ${{matrix.platform.folder}} bin folder
+      run: ${{matrix.platform.zipper}} ${{matrix.platform.zip}} ${{matrix.platform.folder}}
+
+    - name: Create github release and upload ${{matrix.platform.zip}}
+      continue-on-error: true
+      run: gh release create ${{github.ref_name}} ${{matrix.platform.zip}} --title "${{github.ref_name}}" --notes "Release notes for ${{github.ref_name}}" --draft=false --prerelease=false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload ${{matrix.platform.zip}} to release
+      continue-on-error: true
+      run: gh release upload ${{github.ref_name}} ${{matrix.platform.zip}}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

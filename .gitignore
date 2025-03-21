@@ -1,0 +1,56 @@
+data
+datasets
+runs
+logs
+raw_data_runs
+*.pt
+*.pth
+*__pycache__
+
+src/tmp
+build
+*.nn
+*.tmp
+docs/*.mp4
+*.mp4
+*.jpg
+*.png
+*.jpeg
+*.torchscript
+*.pt
+*.pth
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+build
