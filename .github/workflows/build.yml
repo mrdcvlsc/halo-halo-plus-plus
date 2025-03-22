@@ -98,7 +98,7 @@ jobs:
     - name: Install ultralytics and numpy for testing
       run: |
         python3 --version
-        pip install git+https://github.com/ultralytics/ultralytics.git@main
+        pip3 install git+https://github.com/ultralytics/ultralytics.git@main
 
     - name: Download test files
       run: make download-test-files
