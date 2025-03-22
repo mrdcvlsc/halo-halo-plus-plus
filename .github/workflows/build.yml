@@ -92,6 +92,7 @@ jobs:
       run: tree build
 
     - name: Create test folder
+      continue-on-error: true
       run: mkdir test_folder
 
     - name: Install ultralytics and numpy for testing
@@ -127,10 +128,10 @@ jobs:
     - name: Copy YOLOv11n to the build/bin folder (Windows)
       if: runner.os == 'Windows'
       run: |
-        xcopy yolo11n.torchscript ${{ matrix.platform.folder }}
-        xcopy yolo11n-96-in-dim.torchscript ${{ matrix.platform.folder }}
-        xcopy yolo11n-160-in-dim.torchscript ${{ matrix.platform.folder }}
-        xcopy yolo11n-320-in-dim.torchscript ${{ matrix.platform.folder }}
+        xcopy /y yolo11n.torchscript ${{ matrix.platform.folder }}
+        xcopy /y yolo11n-96-in-dim.torchscript ${{ matrix.platform.folder }}
+        xcopy /y yolo11n-160-in-dim.torchscript ${{ matrix.platform.folder }}
+        xcopy /y yolo11n-320-in-dim.torchscript ${{ matrix.platform.folder }}
 
     - name: Compress ${{matrix.platform.folder}} bin folder
       run: ${{matrix.platform.zipper}} ${{matrix.platform.zip}} ${{matrix.platform.folder}}
