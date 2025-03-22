@@ -18,9 +18,9 @@ jobs:
       matrix:
         platform:
             # - { name: Windows GCC,    os: windows-latest, folder: .\\build\\bin\\,          zip: windows-gcc.zip,   zipper: 7z a -tzip, flags: -G "Unix Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++, extension: .exe }
-        - { name: Windows VS2019, os: windows-2019,   folder: .\\build\\bin\\Release\\, zip: windows-VS19.zip,  zipper: 7z a -tzip, copy: xcopy /E /I test_folder, flags: -G "Visual Studio 16 2019" -A x64, extension: .exe }
-        - { name: Windows VS2022, os: windows-2022,   folder: .\\build\\bin\\Release\\, zip: windows-VS22.zip,  zipper: 7z a -tzip, copy: xcopy /E /I test_folder, flags: -G "Visual Studio 17 2022" -A x64, extension: .exe }
-        - { name: Windows Clang,  os: windows-2022,   folder: .\\build\\bin\\,          zip: windows-clang.zip, zipper: 7z a -tzip, copy: xcopy /E /I test_folder, flags: -G "Visual Studio 17 2022" -A x64 -T ClangCL , extension: .exe }
+        - { name: Windows VS2019, os: windows-2019,   folder: .\\build\\bin\\Release\\, zip: windows-VS19.zip,  zipper: 7z a -tzip, copy: robocopy /E /COPYALL test_folder .\\build\\bin\\Release\\test_folder, flags: -G "Visual Studio 16 2019" -A x64, extension: .exe }
+        - { name: Windows VS2022, os: windows-2022,   folder: .\\build\\bin\\Release\\, zip: windows-VS22.zip,  zipper: 7z a -tzip, copy: robocopy /E /COPYALL test_folder .\\build\\bin\\Release\\test_folder, flags: -G "Visual Studio 17 2022" -A x64, extension: .exe }
+        - { name: Windows Clang,  os: windows-2022,   folder: .\\build\\bin\\,          zip: windows-clang.zip, zipper: 7z a -tzip, copy: robocopy /E /COPYALL test_folder .\\build\\bin\\test_folder,          flags: -G "Visual Studio 17 2022" -A x64 -T ClangCL , extension: .exe }
         - { name: MacOS XCode,    os: macos-latest,   folder: ./build/bin/,             zip: mac.zip,           zipper: zip -r,     copy: cp -r test_folder }
         - { name: Linux GCC,      os: ubuntu-latest,  folder: ./build/bin/,             zip: ubuntu-gcc.zip,    zipper: zip -r,     copy: cp -r test_folder }
         - { name: Linux Clang,    os: ubuntu-latest,  folder: ./build/bin/,             zip: ubuntu-clang.zip,  zipper: zip -r,     copy: cp -r test_folder,       flags: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ }
@@ -38,51 +38,70 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Install linux SFML dependencies
-      if: runner.os == 'Linux'
-      run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libxi-dev libudev-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev libfreetype-dev
+    - name: display python version
+      run: |
+        python3 --version
 
-    - name: Install linux OpenCV
+    - name: install ultralytics
+      run: |
+        python3 --version
+        pip install ultralytics
+
+    - name: install numpy
+      run: |
+        python3 --version
+        pip install numpy
+
+    - name: install linux SFML dependencies
+      if: runner.os == 'Linux'
+      run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libxi-dev libudev-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev libfreetype-dev libopenblas-dev
+
+    - name: install linux OpenCV
       if: runner.os == 'Linux'
       run: sudo apt install libopencv-dev
 
-    - name: Download OpenCV and Extract sources
+    - name: install openblas in windows if possible
+      if: runner.os == 'Windows'
+      continue-on-error: true
+      run: vcpkg install openblas
+
+    - name: download OpenCV and Extract sources
       if: runner.os == 'Windows'
       run: |
         curl -L -o 4.11.0.zip https://github.com/opencv/opencv/archive/refs/tags/4.11.0.zip
         tar -xf "4.11.0.zip" -C ".\"
 
-    - name: Download OpenCV and Extract sources
+    - name: download OpenCV and Extract sources
       if: runner.os == 'Windows'
       run: git clone https://github.com/opencv/opencv_contrib.git
        
-    - name: CMake Config OpenCV (Windows)
+    - name: cmake config OpenCV (Windows)
       if: runner.os == 'Windows'
       run: |
         cd opencv-4.11.0
         cmake -S . -B build ${{matrix.platform.flags}} ${{matrix.config.flags}} ${{matrix.build.flags}} -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DCMAKE_INSTALL_PREFIX="build/install" -DBUILD_PERF_TESTS=OFF -DBUILD_TESTS=OFF -DBUILD_DOCS=OFF  -DWITH_CUDA=OFF -DBUILD_EXAMPLES=OFF -DINSTALL_CREATE_DISTRIB=ON
 
-    - name: CMake Build OpenCV (Windows)
+    - name: cmake Build OpenCV (Windows)
       if: runner.os == 'Windows'
       run: |
         cd opencv-4.11.0
         cmake --build build --config Release
 
-    - name: CMake Install OpenCV (Windows)
+    - name: cmake Install OpenCV (Windows)
       if: runner.os == 'Windows'
       run: |
         cd opencv-4.11.0
         cmake --build build --target install --config Release
 
-    - name: Verify OpenCV Installation
+    - name: verify OpenCV installation
       if: runner.os == 'Windows'
       run: dir opencv-4.11.0\build\install
 
     - name: Install MacOS Dependencies
       if: runner.os == 'macOS'
-      run: brew install opencv tree
+      run: brew install opencv tree openblas
 
-    - name: Configure project
+    - name: configure project
       run: cmake -S . -B build -DCMAKE_INSTALL_PREFIX=install -DOpenCV_DIR="opencv-4.11.0/build/install" ${{matrix.platform.flags}} ${{matrix.config.flags}} ${{matrix.build.flags}}
 
     - name: Build ${{matrix.platform.bin}} executable
@@ -91,28 +110,23 @@ jobs:
     - name: Display Build Tree
       run: tree build
 
-    - name: Create test folder
+    - name: create test folder
       continue-on-error: true
       run: mkdir test_folder
-
-    - name: Install ultralytics and numpy for testing
-      run: |
-        python --version
-        pip install git+https://github.com/ultralytics/ultralytics.git@main
-
-    - name: Download test files
+      
+    - name: download test files
       run: make download-test-files
 
-    - name: Download ultralytics YOLOv11n model for testing
+    - name: download ultralytics YOLOv11n model for testing
       run: python pt_to_torchscript.py
 
-    - name: Run test programs
+    - name: run test programs
       run: make test EXECUTABLE=${{ matrix.platform.folder }}${{matrix.platform.bin}}draw_bounding_box${{matrix.platform.extension}}
 
-    - name: Copy test folder to bin directory
-      run: ${{ matrix.platform.copy }} ${{ matrix.platform.folder }}test_folder
+    - name: copy test folder to bin directory
+      run: ${{ matrix.platform.copy }}
 
-    - name: Copy YOLOv11n to the build/bin folder (Linux)
+    - name: copy YOLOv11n to the build/bin folder (Linux)
       if: runner.os == 'Linux'
       run: |
         cp yolo11n.torchscript ${{ matrix.platform.folder }}
@@ -120,7 +134,7 @@ jobs:
         cp yolo11n-160-in-dim.torchscript ${{ matrix.platform.folder }}
         cp yolo11n-320-in-dim.torchscript ${{ matrix.platform.folder }}
 
-    - name: Copy YOLOv11n to the build/bin folder (macOS)
+    - name: copy YOLOv11n to the build/bin folder (macOS)
       if: runner.os == 'macOS'
       run: |
         cp yolo11n.torchscript ${{ matrix.platform.folder }}
@@ -128,18 +142,19 @@ jobs:
         cp yolo11n-160-in-dim.torchscript ${{ matrix.platform.folder }}
         cp yolo11n-320-in-dim.torchscript ${{ matrix.platform.folder }}
 
-    - name: Copy YOLOv11n to the build/bin folder (Windows)
+    - name: copy YOLOv11n to the build/bin folder (Windows)
       if: runner.os == 'Windows'
+      continue-on-error: true
       run: |
-        xcopy /y yolo11n.torchscript ${{ matrix.platform.folder }}
-        xcopy /y yolo11n-96-in-dim.torchscript ${{ matrix.platform.folder }}
-        xcopy /y yolo11n-160-in-dim.torchscript ${{ matrix.platform.folder }}
-        xcopy /y yolo11n-320-in-dim.torchscript ${{ matrix.platform.folder }}
+        robocopy yolo11n.torchscript ${{ matrix.platform.folder }}
+        robocopy yolo11n-96-in-dim.torchscript ${{ matrix.platform.folder }}
+        robocopy yolo11n-160-in-dim.torchscript ${{ matrix.platform.folder }}
+        robocopy yolo11n-320-in-dim.torchscript ${{ matrix.platform.folder }}
 
-    - name: Compress ${{matrix.platform.folder}} bin folder
+    - name: compress ${{matrix.platform.folder}} bin folder
       run: ${{matrix.platform.zipper}} ${{matrix.platform.zip}} ${{matrix.platform.folder}}
 
-    - name: Create github release and upload ${{matrix.platform.zip}}
+    - name: create github release and upload ${{matrix.platform.zip}}
       continue-on-error: true
       run: gh release create ${{github.ref_name}} ${{matrix.platform.zip}} --title "${{github.ref_name}}" --notes "Release notes for ${{github.ref_name}}" --draft=false --prerelease=false
       env:
