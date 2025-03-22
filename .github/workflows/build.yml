@@ -43,15 +43,16 @@ jobs:
       run: |
         python3 --version
 
+    - name: install numpy and torch if possible
+      continue-on-error: true
+      run: |
+        python3 --version
+        pip install numpy torch torchvision torchaudio
+
     - name: install ultralytics
       run: |
         python3 --version
         pip install ultralytics
-
-    - name: install numpy
-      run: |
-        python3 --version
-        pip install numpy
 
     - name: install linux SFML dependencies
       if: runner.os == 'Linux'
