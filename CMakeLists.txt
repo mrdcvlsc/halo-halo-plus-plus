@@ -41,6 +41,11 @@ if(APPLE)
     endif()
 endif()
 
+if (CMAKE_GENERATOR MATCHES "Visual Studio" AND CMAKE_VS_PLATFORM_TOOLSET STREQUAL "ClangCL")
+    message(STATUS "Configuring for Clang-CL on Windows")
+    set(CPU_BASELINE "SSE;SSE2;SSE3;SSE4_1;SSE4_2;POPCNT")
+endif()
+
 # ------------------------------------------------------------------
 # SFML
 # ------------------------------------------------------------------
