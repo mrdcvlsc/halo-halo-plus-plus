@@ -101,7 +101,7 @@ jobs:
       run: make download-test-files
 
     - name: Run test programs
-      run: make test EXECUTABLE=${{matrix.platform.bin}}draw_bounding_box${{matrix.platform.extension}}
+      run: make test EXECUTABLE=${{ matrix.platform.folder }}${{matrix.platform.bin}}draw_bounding_box${{matrix.platform.extension}}
 
     - name: Copy test folder to bin directory
       run: ${{ matrix.platform.copy }} ${{ matrix.platform.folder }}test_folder
