@@ -116,7 +116,11 @@ find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
 # ------------------------------------------------------------------
+
+
+# ==================================================================
 # live_cam_object_detection (OpenCV + libtorch)
+# ==================================================================
 
 add_executable(live_cam_object_detection live_cam_object_detection.cpp get_cameras.cpp event_keys.cpp preprocess_frame.cpp get_class_color.cpp logger.cpp)
 target_link_libraries(live_cam_object_detection PRIVATE "${TORCH_LIBRARIES}")
@@ -139,8 +143,9 @@ if (MSVC)
                         $<TARGET_FILE_DIR:live_cam_object_detection>)
 endif (MSVC)
 
-# ------------------------------------------------------------------
+# ==================================================================
 # live_cam_motion_detection (OpenCV only)
+# ==================================================================
 
 add_executable(live_cam_motion_detection live_cam_motion_detection.cpp get_cameras.cpp event_keys.cpp logger.cpp)
 # target_link_libraries(live_cam_motion_detection PRIVATE "${TORCH_LIBRARIES}")
@@ -162,8 +167,10 @@ set_property(TARGET live_cam_motion_detection PROPERTY CXX_STANDARD 17)
 #                             $<TARGET_FILE_DIR:live_cam_motion_detection>)
 # endif (MSVC)
 
-# ------------------------------------------------------------------
+
+# ==================================================================
 # draw_bounding_box (OpenCV + libtorch)
+# ==================================================================
 
 add_executable(draw_bounding_box draw_bounding_box.cpp preprocess_frame.cpp get_class_color.cpp event_keys.cpp logger.cpp)
 target_link_libraries(draw_bounding_box PRIVATE "${TORCH_LIBRARIES}")
@@ -183,3 +190,27 @@ if (MSVC)
                             ${TORCH_DLLS}
                             $<TARGET_FILE_DIR:draw_bounding_box>)
 endif (MSVC)
+
+# ==================================================================
+
+# //////////////////////////////////////////////////////////////////
+# Copy all assets to the build/bin for packaging
+# //////////////////////////////////////////////////////////////////
+
+file(GLOB ASSET_FILES
+    ${CMAKE_SOURCE_DIR}/*.jpg
+    ${CMAKE_SOURCE_DIR}/*.jpeg
+    ${CMAKE_SOURCE_DIR}/*.png
+    ${CMAKE_SOURCE_DIR}/*.torchscript
+    ${CMAKE_SOURCE_DIR}/*.mp3
+    ${CMAKE_SOURCE_DIR}/*.wav
+    ${CMAKE_SOURCE_DIR}/*.mp4
+)
+
+add_custom_target(copy_assets ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ASSET_FILES} $<TARGET_FILE_DIR:live_cam_object_detection>
+    DEPENDS
+        live_cam_object_detection
+        live_cam_motion_detection
+        draw_bounding_box
+)
