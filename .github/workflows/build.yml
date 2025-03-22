@@ -97,11 +97,14 @@ jobs:
 
     - name: Install ultralytics and numpy for testing
       run: |
-        python3 --version
-        pip3 install git+https://github.com/ultralytics/ultralytics.git@main
+        python --version
+        pip install git+https://github.com/ultralytics/ultralytics.git@main
 
     - name: Download test files
       run: make download-test-files
+
+    - name: Download ultralytics YOLOv11n model for testing
+      run: python pt_to_torchscript.py
 
     - name: Run test programs
       run: make test EXECUTABLE=${{ matrix.platform.folder }}${{matrix.platform.bin}}draw_bounding_box${{matrix.platform.extension}}
