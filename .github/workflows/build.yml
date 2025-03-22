@@ -73,7 +73,7 @@ jobs:
         curl -L -o 4.11.0.zip https://github.com/opencv/opencv/archive/refs/tags/4.11.0.zip
         tar -xf "4.11.0.zip" -C ".\"
 
-    - name: download OpenCV and Extract sources
+    - name: clone OpenCV-Contrib
       if: runner.os == 'Windows'
       run: git clone https://github.com/opencv/opencv_contrib.git
        
@@ -126,7 +126,15 @@ jobs:
       run: make test EXECUTABLE=${{ matrix.platform.folder }}${{matrix.platform.bin}}draw_bounding_box${{matrix.platform.extension}}
 
     - name: copy test folder to bin directory
-      run: ${{ matrix.platform.copy }}
+      shell: pwsh
+      run: |
+        ${{ matrix.platform.copy }}
+        
+        if ($LASTEXITCODE -eq 1 -or $LASTEXITCODE -eq 0) {
+          exit 0
+        } else {
+          exit $LASTEXITCODE
+        }
 
     - name: copy YOLOv11n to the build/bin folder (Linux)
       if: runner.os == 'Linux'
@@ -146,12 +154,21 @@ jobs:
 
     - name: copy YOLOv11n to the build/bin folder (Windows)
       if: runner.os == 'Windows'
-      continue-on-error: true
+      shell: pwsh
       run: |
         robocopy yolo11n.torchscript ${{ matrix.platform.folder }}
+        if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) { exit $LASTEXITCODE }
+
         robocopy yolo11n-96-in-dim.torchscript ${{ matrix.platform.folder }}
+        if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) { exit $LASTEXITCODE }
+
         robocopy yolo11n-160-in-dim.torchscript ${{ matrix.platform.folder }}
+        if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) { exit $LASTEXITCODE }
+
         robocopy yolo11n-320-in-dim.torchscript ${{ matrix.platform.folder }}
+        if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) { exit $LASTEXITCODE }
+        
+        exit 0
 
     - name: compress ${{matrix.platform.folder}} bin folder
       run: ${{matrix.platform.zipper}} ${{matrix.platform.zip}} ${{matrix.platform.folder}}
