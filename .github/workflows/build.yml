@@ -94,6 +94,9 @@ jobs:
     - name: Create test folder
       run: mkdir test_folder
 
+    - name: Install ultralytics and numpy for testing
+      run: pip install ultralytics numpy
+
     - name: Download test files
       run: make download-test-files
 
