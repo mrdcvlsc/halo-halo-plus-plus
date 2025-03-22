@@ -30,7 +30,6 @@ int main(int argc, char **argv)
         std::cerr << "Usage: " << argv[0]
                   << "[confidence-threshold] [non-max-suppression-threshold] "
                      "[torch-script-jit-model] [model-input-dimension-size]\n";
-        return 1;
     }
 
     std::cout << "key controls:\n"
@@ -40,36 +39,48 @@ int main(int argc, char **argv)
                  "]          =  switch to next camera.\n"
               << "\n";
 
-    char *err_ptr;
+    float       confidence_threshold = 0.5f;
+    float       nms_threshold = 0.5f;
+    std::string model_path = "yolo11n.torchscript";
+    float       model_input_dim_size = 640.f;
 
-    // higher value will produce less detected objects due to higher detection passing rate
-    float confidence_threshold = std::strtof(argv[1], &err_ptr);
+    if (argc > 1) {
+        char *err_ptr;
 
-    if (*err_ptr != '\0') {
-        std::cerr << "invalid argument 1 (confidence threshold) value, not a number\n";
-        return 1;
+        // higher value will produce less detected objects due to higher detection passing rate
+        confidence_threshold = std::strtof(argv[1], &err_ptr);
+
+        if (*err_ptr != '\0') {
+            std::cerr << "invalid argument 1 (confidence threshold) value, not a number\n";
+            return 1;
+        }
+
+        // non-max suppression threshold, higher value produces more detected objects but can increase detection
+        // redundancy
+        nms_threshold = std::strtof(argv[2], &err_ptr);
+
+        if (*err_ptr != '\0') {
+            std::cerr << "invalid argument 2 (NMS threshold) value, not a number\n";
+            return 1;
+        }
+
+        model_path = argv[3];
+        if (!std::filesystem::exists(model_path)) {
+            std::cerr << "invalid argument 3, file not found (model: '" << model_path << "')\n";
+            return 1;
+        }
+
+        // model_input_dim_size x model_input_dim_size
+        model_input_dim_size = std::strtof(argv[4], &err_ptr);
+
+        if (*err_ptr != '\0') {
+            std::cerr << "invalid argument 4 (model_input_dim_size) value, not a number\n";
+            return 1;
+        }
     }
 
-    // non-max suppression threshold, higher value produces more detected objects but can increase detection redundancy
-    float nms_threshold = std::strtof(argv[2], &err_ptr);
-
-    if (*err_ptr != '\0') {
-        std::cerr << "invalid argument 2 (NMS threshold) value, not a number\n";
-        return 1;
-    }
-
-    std::string model_path = argv[3];
-    if (!std::filesystem::exists(model_path)) {
-        std::cerr << "invalid argument 3, file not found (model: '" << model_path << "')\n";
-        return 1;
-    }
-
-    // model_input_dim_size x model_input_dim_size
-    float model_input_dim_size = std::strtof(argv[4], &err_ptr);
-
-    if (*err_ptr != '\0') {
-        std::cerr << "invalid argument 4 (model_input_dim_size) value, not a number\n";
-        return 1;
+    if (argc <= 1) {
+        std::cout << "Using Default Argument Values\n";
     }
 
     printf("confidence-threshold          : %.2f\n", confidence_threshold);
@@ -266,7 +277,7 @@ int main(int argc, char **argv)
         cv::dnn::NMSBoxes(
           origin_bounding_boxes, confidence_scores, confidence_threshold, nms_threshold, final_detection_indices
         );
-        
+
         end = std::chrono::system_clock::now();
         dur = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
         std::cout << "non-max suppression : " << dur.count() << "ns\n";

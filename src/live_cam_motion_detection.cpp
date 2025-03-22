@@ -39,31 +39,53 @@ int main(int argc, char **argv)
                  "s          =  toggle (on/off) detect shadow ('on' by default).\n"
               << "\n";
 
-    char *err_ptr;
+    // default values if no args provided:
 
-    int history = std::strtol(argv[1], &err_ptr, 10);
-    if (*err_ptr != '\0') {
-        std::cerr << "invalid argument 1 (history) value, not a number\n";
-        return 1;
+    int history = 100;
+    int sensitivity_threshold = 200;
+    int min_area = 850;
+    int flip_value = 10;
+
+    if (argc > 1) {
+        char *err_ptr;
+
+        history = std::strtol(argv[1], &err_ptr, 10);
+        if (*err_ptr != '\0') {
+            std::cerr << "invalid argument 1 (history) value, not a number\n";
+            return 1;
+        }
+
+        sensitivity_threshold = std::strtol(argv[2], &err_ptr, 10);
+        if (*err_ptr != '\0') {
+            std::cerr << "invalid argument 2 (sensitivity_threshold) value, not a number\n";
+            return 1;
+        }
+
+        min_area = std::strtol(argv[3], &err_ptr, 10);
+        if (*err_ptr != '\0') {
+            std::cerr << "invalid argument 3 (min_area) value, not a number\n";
+            return 1;
+        }
+
+        flip_value = std::strtol(argv[4], &err_ptr, 10);
+        if (*err_ptr != '\0') {
+            std::cerr << "invalid argument 4 (flip_value) value, not a number\n";
+            return 1;
+        }
     }
 
-    int sensitivity_threshold = std::strtol(argv[2], &err_ptr, 10);
-    if (*err_ptr != '\0') {
-        std::cerr << "invalid argument 2 (sensitivity_threshold) value, not a number\n";
-        return 1;
+    if (argc <= 1) {
+        std::cout << "Using Default Argument Values\n";
     }
 
-    int min_area = std::strtol(argv[3], &err_ptr, 10);
-    if (*err_ptr != '\0') {
-        std::cerr << "invalid argument 3 (min_area) value, not a number\n";
-        return 1;
-    }
+    printf("history               : %d\n", history);
+    printf("sensitivity_threshold : %d\n", sensitivity_threshold);
+    printf("min_area              : %d\n", min_area);
+    printf("flip_value            : %d\n\n", flip_value);
 
-    int flip_value = std::strtol(argv[4], &err_ptr, 10);
-    if (*err_ptr != '\0') {
-        std::cerr << "invalid argument 4 (flip_value) value, not a number\n";
-        return 1;
-    }
+    // printf("num_interop_threads : %d\n", torch::get_num_interop_threads());
+    // printf("num_threads         : %d\n", torch::get_num_threads());
+    // printf("cpu_capability      : %s\n\n", torch::get_cpu_capability().c_str());
 
     const int max_cam_to_check = 10;
 
