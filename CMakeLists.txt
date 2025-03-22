@@ -218,21 +218,11 @@ endif (MSVC)
 # ==================================================================
 
 # //////////////////////////////////////////////////////////////////
-# Copy all assets to the build/bin for packaging
+# copy assets folder to the build/bin folder
 # //////////////////////////////////////////////////////////////////
 
-file(GLOB ASSET_FILES
-    ${CMAKE_SOURCE_DIR}/*.jpg
-    ${CMAKE_SOURCE_DIR}/*.jpeg
-    ${CMAKE_SOURCE_DIR}/*.png
-    ${CMAKE_SOURCE_DIR}/*.torchscript
-    ${CMAKE_SOURCE_DIR}/*.mp3
-    ${CMAKE_SOURCE_DIR}/*.wav
-    ${CMAKE_SOURCE_DIR}/*.mp4
-)
-
-add_custom_target(copy_assets ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ASSET_FILES} $<TARGET_FILE_DIR:live_cam_object_detection>
+add_custom_target(copy_assets_folder ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "${CMAKE_SOURCE_DIR}/assets" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets"
     DEPENDS
         live_cam_object_detection
         live_cam_motion_detection
