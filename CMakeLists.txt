@@ -122,7 +122,15 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 # live_cam_object_detection (OpenCV + libtorch)
 # ==================================================================
 
-add_executable(live_cam_object_detection live_cam_object_detection.cpp get_cameras.cpp event_keys.cpp preprocess_frame.cpp get_class_color.cpp logger.cpp)
+add_executable(live_cam_object_detection
+    src/live_cam_object_detection.cpp
+    src/get_cameras.cpp
+    src/event_keys.cpp
+    src/preprocess_frame.cpp
+    src/get_class_color.cpp
+    src/logger.cpp
+)
+
 target_link_libraries(live_cam_object_detection PRIVATE "${TORCH_LIBRARIES}")
 # target_link_libraries(live_cam_object_detection PRIVATE opencv_highgui opencv_imgcodecs opencv_core opencv_imgproc)
 
@@ -130,7 +138,6 @@ target_link_libraries(live_cam_object_detection PRIVATE "${TORCH_LIBRARIES}")
 target_link_libraries(live_cam_object_detection PRIVATE ${OpenCV_LIBS})
 target_link_libraries(live_cam_object_detection PRIVATE SFML::Audio)
 set_property(TARGET live_cam_object_detection PROPERTY CXX_STANDARD 17)
-
 
 if (MSVC)
     # the official libtorch libraries are shared libs so we need to
@@ -147,7 +154,13 @@ endif (MSVC)
 # live_cam_motion_detection (OpenCV only)
 # ==================================================================
 
-add_executable(live_cam_motion_detection live_cam_motion_detection.cpp get_cameras.cpp event_keys.cpp logger.cpp)
+add_executable(live_cam_motion_detection
+    src/live_cam_motion_detection.cpp
+    src/get_cameras.cpp
+    src/event_keys.cpp
+    src/logger.cpp
+)
+
 # target_link_libraries(live_cam_motion_detection PRIVATE "${TORCH_LIBRARIES}")
 # target_link_libraries(live_cam_motion_detection PRIVATE opencv_highgui opencv_imgcodecs opencv_core opencv_imgproc)
 
@@ -172,7 +185,13 @@ set_property(TARGET live_cam_motion_detection PROPERTY CXX_STANDARD 17)
 # draw_bounding_box (OpenCV + libtorch)
 # ==================================================================
 
-add_executable(draw_bounding_box draw_bounding_box.cpp preprocess_frame.cpp get_class_color.cpp event_keys.cpp logger.cpp)
+add_executable(draw_bounding_box
+    src/draw_bounding_box.cpp
+    src/preprocess_frame.cpp
+    src/get_class_color.cpp
+    src/event_keys.cpp
+    src/logger.cpp
+)
 target_link_libraries(draw_bounding_box PRIVATE "${TORCH_LIBRARIES}")
 # target_link_libraries(draw_bounding_box PRIVATE opencv_highgui opencv_imgcodecs opencv_core opencv_imgproc)
 
