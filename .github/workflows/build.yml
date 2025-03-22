@@ -103,6 +103,30 @@ jobs:
     - name: Copy test folder to bin directory
       run: ${{ matrix.platform.copy }} ${{ matrix.platform.folder }}test_folder
 
+    - name: Copy YOLOv11n to the build/bin folder (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        cp yolo11n.torchscript ${{ matrix.platform.folder }}
+        cp yolo11n-96-in-dim.torchscript ${{ matrix.platform.folder }}
+        cp yolo11n-160-in-dim.torchscript ${{ matrix.platform.folder }}
+        cp yolo11n-320-in-dim.torchscript ${{ matrix.platform.folder }}
+
+    - name: Copy YOLOv11n to the build/bin folder (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        cp yolo11n.torchscript ${{ matrix.platform.folder }}
+        cp yolo11n-96-in-dim.torchscript ${{ matrix.platform.folder }}
+        cp yolo11n-160-in-dim.torchscript ${{ matrix.platform.folder }}
+        cp yolo11n-320-in-dim.torchscript ${{ matrix.platform.folder }}
+
+    - name: Copy YOLOv11n to the build/bin folder (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        xcopy yolo11n.torchscript ${{ matrix.platform.folder }}
+        xcopy yolo11n-96-in-dim.torchscript ${{ matrix.platform.folder }}
+        xcopy yolo11n-160-in-dim.torchscript ${{ matrix.platform.folder }}
+        xcopy yolo11n-320-in-dim.torchscript ${{ matrix.platform.folder }}
+
     - name: Compress ${{matrix.platform.folder}} bin folder
       run: ${{matrix.platform.zipper}} ${{matrix.platform.zip}} ${{matrix.platform.folder}}
 
