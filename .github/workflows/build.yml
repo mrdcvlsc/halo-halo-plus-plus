@@ -58,9 +58,9 @@ jobs:
       if: runner.os == 'Linux'
       run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libxi-dev libudev-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev libfreetype-dev libopenblas-dev
 
-    - name: install linux OpenCV
-      if: runner.os == 'Linux'
-      run: sudo apt install libopencv-dev
+    - name: Install MacOS Dependencies
+      if: runner.os == 'macOS'
+      run: brew install tree openblas
 
     - name: install openblas in windows if possible
       if: runner.os == 'Windows'
@@ -68,29 +68,24 @@ jobs:
       run: vcpkg install openblas
 
     - name: download OpenCV and Extract sources
-      if: runner.os == 'Windows'
       run: |
         curl -L -o 4.11.0.zip https://github.com/opencv/opencv/archive/refs/tags/4.11.0.zip
         tar -xf "4.11.0.zip" -C ".\"
 
     - name: clone OpenCV-Contrib
-      if: runner.os == 'Windows'
       run: git clone https://github.com/opencv/opencv_contrib.git
        
-    - name: cmake config OpenCV (Windows)
-      if: runner.os == 'Windows'
+    - name: cmake config OpenCV
       run: |
         cd opencv-4.11.0
         cmake -S . -B build ${{matrix.platform.flags}} ${{matrix.config.flags}} ${{matrix.build.flags}} -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DCMAKE_INSTALL_PREFIX="build/install" -DBUILD_PERF_TESTS=OFF -DBUILD_TESTS=OFF -DBUILD_DOCS=OFF  -DWITH_CUDA=OFF -DBUILD_EXAMPLES=OFF -DINSTALL_CREATE_DISTRIB=ON
 
-    - name: cmake Build OpenCV (Windows)
-      if: runner.os == 'Windows'
+    - name: cmake Build OpenCV
       run: |
         cd opencv-4.11.0
         cmake --build build --config Release
 
-    - name: cmake Install OpenCV (Windows)
-      if: runner.os == 'Windows'
+    - name: cmake Install OpenCV
       run: |
         cd opencv-4.11.0
         cmake --build build --target install --config Release
@@ -98,10 +93,6 @@ jobs:
     - name: verify OpenCV installation
       if: runner.os == 'Windows'
       run: dir opencv-4.11.0\build\install
-
-    - name: Install MacOS Dependencies
-      if: runner.os == 'macOS'
-      run: brew install opencv tree openblas
 
     - name: configure project
       run: cmake -S . -B build -DCMAKE_INSTALL_PREFIX=install -DOpenCV_DIR="opencv-4.11.0/build/install" ${{matrix.platform.flags}} ${{matrix.config.flags}} ${{matrix.build.flags}}
