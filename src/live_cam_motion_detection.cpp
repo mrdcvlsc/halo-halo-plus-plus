@@ -100,7 +100,7 @@ int main(int argc, char **argv)
 
     bool is_enable_action = false;
 
-    sf::SoundBuffer sound_buffer("alert.wav");
+    sf::SoundBuffer sound_buffer("assets/alert.wav");
     sf::Sound       alert_sound(sound_buffer);
 
     alert_sound.play();
