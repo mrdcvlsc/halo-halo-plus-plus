@@ -20,7 +20,7 @@ dbuild:
 clean:
 	rm -rf bb*.jpg *.pt *.torchscript runs exp10-new datasets
 
-download-test-files: yolo11n.pt
+download-test-files:
 	python3 pt_to_torchscript.py
 	curl -L -o test_folder/shibuya.jpg  https://github.com/mrdcvlsc/halo-halo-plus-plus/releases/download/test-resources/shibuya.jpg
 	curl -L -o test_folder/office.jpg   https://github.com/mrdcvlsc/halo-halo-plus-plus/releases/download/test-resources/office.jpg
