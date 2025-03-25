@@ -50,6 +50,10 @@ if (CMAKE_GENERATOR MATCHES "Visual Studio" AND CMAKE_VS_PLATFORM_TOOLSET STREQU
     set(CPU_BASELINE "SSE;SSE2;SSE3;SSE4_1;SSE4_2;POPCNT")
 endif()
 
+message(STATUS "CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
+message(STATUS "CMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
+message(STATUS "CPU_BASELINE=${CPU_BASELINE}")
+
 # ------------------------------------------------------------------
 # SFML
 # ------------------------------------------------------------------
