@@ -18,13 +18,13 @@ jobs:
       matrix:
         platform:
             # - { name: Windows GCC,    os: windows-latest, folder: .\\build\\bin\\,          zip: windows-gcc.zip,   zipper: 7z a -tzip, flags: -G "Unix Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++, extension: .exe }
-        - { name: Windows VS2019,       os: windows-2019,   folder: .\\build\\bin\\Release\\, zip: windows-VS19.zip,  zipper: 7z a -tzip, unzip: tar -xf -C ., copy: robocopy /E /COPYALL test_folder .\\build\\bin\\Release\\test_folder, flags: -G "Visual Studio 16 2019" -A x64, extension: .exe }
-        - { name: Windows VS2022,       os: windows-2022,   folder: .\\build\\bin\\Release\\, zip: windows-VS22.zip,  zipper: 7z a -tzip, unzip: tar -xf -C ., copy: robocopy /E /COPYALL test_folder .\\build\\bin\\Release\\test_folder, flags: -G "Visual Studio 17 2022" -A x64, extension: .exe }
-        - { name: Windows Clang,        os: windows-2022,   folder: .\\build\\bin\\,          zip: windows-clang.zip, zipper: 7z a -tzip, unzip: tar -xf -C ., copy: robocopy /E /COPYALL test_folder .\\build\\bin\\test_folder,          flags: -G "Visual Studio 17 2022" -A x64 -T ClangCL , extension: .exe }
-        - { name: MacOS XCode - arm64,  os: macos-14,       folder: ./build/bin/,             zip: mac-arm64.zip,     zipper: zip -r,     unzip: unzip -d ./,  copy: cp -r test_folder ./build/bin/test_folder }
-        - { name: MacOS XCode - x86-64, os: macos-13,       folder: ./build/bin/,             zip: mac-x86-64.zip,    zipper: zip -r,     unzip: unzip -d ./,  copy: cp -r test_folder ./build/bin/test_folder }
-        - { name: Linux GCC,            os: ubuntu-24.04,   folder: ./build/bin/,             zip: ubuntu-gcc.zip,    zipper: zip -r,     unzip: unzip -d ./,  copy: cp -r test_folder ./build/bin/test_folder }
-        - { name: Linux Clang,          os: ubuntu-24.04,   folder: ./build/bin/,             zip: ubuntu-clang.zip,  zipper: zip -r,     unzip: unzip -d ./,  copy: cp -r test_folder ./build/bin/test_folder,       flags: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ }
+        - { name: Windows VS2019,       os: windows-2019,   folder: .\\build\\bin\\Release\\, zip: windows-VS19.zip,  zipper: 7z a -tzip, unzip: tar -xf *.zip -C ., copy: robocopy /E /COPYALL test_folder .\\build\\bin\\Release\\test_folder, flags: -G "Visual Studio 16 2019" -A x64, extension: .exe }
+        - { name: Windows VS2022,       os: windows-2022,   folder: .\\build\\bin\\Release\\, zip: windows-VS22.zip,  zipper: 7z a -tzip, unzip: tar -xf *.zip -C ., copy: robocopy /E /COPYALL test_folder .\\build\\bin\\Release\\test_folder, flags: -G "Visual Studio 17 2022" -A x64, extension: .exe }
+        - { name: Windows Clang,        os: windows-2022,   folder: .\\build\\bin\\,          zip: windows-clang.zip, zipper: 7z a -tzip, unzip: tar -xf *.zip -C ., copy: robocopy /E /COPYALL test_folder .\\build\\bin\\test_folder,          flags: -G "Visual Studio 17 2022" -A x64 -T ClangCL , extension: .exe }
+        - { name: MacOS XCode - arm64,  os: macos-14,       folder: ./build/bin/,             zip: mac-arm64.zip,     zipper: zip -r,     unzip: unzip *.zip -d ./,  copy: cp -r test_folder ./build/bin/test_folder }
+        - { name: MacOS XCode - x86-64, os: macos-13,       folder: ./build/bin/,             zip: mac-x86-64.zip,    zipper: zip -r,     unzip: unzip *.zip -d ./,  copy: cp -r test_folder ./build/bin/test_folder }
+        - { name: Linux GCC,            os: ubuntu-24.04,   folder: ./build/bin/,             zip: ubuntu-gcc.zip,    zipper: zip -r,     unzip: unzip *.zip -d ./,  copy: cp -r test_folder ./build/bin/test_folder }
+        - { name: Linux Clang,          os: ubuntu-24.04,   folder: ./build/bin/,             zip: ubuntu-clang.zip,  zipper: zip -r,     unzip: unzip *.zip -d ./,  copy: cp -r test_folder ./build/bin/test_folder,       flags: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ }
         config:
         - { name: static, flags: -DBUILD_SHARED_LIBS=FALSE }
         # - { name: shared, flags: -DBUILD_SHARED_LIBS=TRUE }
@@ -73,7 +73,7 @@ jobs:
       run: curl -L -o ${{ matrix.opencv.zip_version }} https://github.com/opencv/opencv/archive/refs/tags/${{ matrix.opencv.zip_version }}
 
     - name: extract OpenCV sources
-      run: ${{ matrix.platform.unzip }} ${{ matrix.opencv.zip_version }}
+      run: ${{ matrix.platform.unzip }}
 
     - name: clone OpenCV-Contrib
       run: git clone https://github.com/opencv/opencv_contrib.git
