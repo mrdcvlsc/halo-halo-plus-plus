@@ -18,13 +18,13 @@ jobs:
       matrix:
         platform:
             # - { name: Windows GCC,    os: windows-latest, folder: .\\build\\bin\\,          zip: windows-gcc.zip,   zipper: 7z a -tzip, flags: -G "Unix Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++, extension: .exe }
-        - { name: Windows VS2019,       os: windows-2019,   folder: .\\build\\bin\\Release\\, zip: windows-VS19.zip,  zipper: 7z a -tzip, copy: robocopy /E /COPYALL test_folder .\\build\\bin\\Release\\test_folder, flags: -G "Visual Studio 16 2019" -A x64, extension: .exe }
-        - { name: Windows VS2022,       os: windows-2022,   folder: .\\build\\bin\\Release\\, zip: windows-VS22.zip,  zipper: 7z a -tzip, copy: robocopy /E /COPYALL test_folder .\\build\\bin\\Release\\test_folder, flags: -G "Visual Studio 17 2022" -A x64, extension: .exe }
-        - { name: Windows Clang,        os: windows-2022,   folder: .\\build\\bin\\,          zip: windows-clang.zip, zipper: 7z a -tzip, copy: robocopy /E /COPYALL test_folder .\\build\\bin\\test_folder,          flags: -G "Visual Studio 17 2022" -A x64 -T ClangCL , extension: .exe }
-        - { name: MacOS XCode - arm64,  os: macos-14,       folder: ./build/bin/,             zip: mac-arm64.zip,     zipper: zip -r,     copy: cp -r test_folder ./build/bin/test_folder }
-        - { name: MacOS XCode - x86-64, os: macos-13,       folder: ./build/bin/,             zip: mac-x86-64.zip,    zipper: zip -r,     copy: cp -r test_folder ./build/bin/test_folder }
-        - { name: Linux GCC,            os: ubuntu-24.04,   folder: ./build/bin/,             zip: ubuntu-gcc.zip,    zipper: zip -r,     copy: cp -r test_folder ./build/bin/test_folder }
-        - { name: Linux Clang,          os: ubuntu-24.04,   folder: ./build/bin/,             zip: ubuntu-clang.zip,  zipper: zip -r,     copy: cp -r test_folder ./build/bin/test_folder,       flags: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ }
+        - { name: Windows VS2019,       os: windows-2019,   folder: .\\build\\bin\\Release\\, zip: windows-VS19.zip,  zipper: 7z a -tzip, unzip: tar -xf -C ., copy: robocopy /E /COPYALL test_folder .\\build\\bin\\Release\\test_folder, flags: -G "Visual Studio 16 2019" -A x64, extension: .exe }
+        - { name: Windows VS2022,       os: windows-2022,   folder: .\\build\\bin\\Release\\, zip: windows-VS22.zip,  zipper: 7z a -tzip, unzip: tar -xf -C ., copy: robocopy /E /COPYALL test_folder .\\build\\bin\\Release\\test_folder, flags: -G "Visual Studio 17 2022" -A x64, extension: .exe }
+        - { name: Windows Clang,        os: windows-2022,   folder: .\\build\\bin\\,          zip: windows-clang.zip, zipper: 7z a -tzip, unzip: tar -xf -C ., copy: robocopy /E /COPYALL test_folder .\\build\\bin\\test_folder,          flags: -G "Visual Studio 17 2022" -A x64 -T ClangCL , extension: .exe }
+        - { name: MacOS XCode - arm64,  os: macos-14,       folder: ./build/bin/,             zip: mac-arm64.zip,     zipper: zip -r,     unzip: unzip -d ./,  copy: cp -r test_folder ./build/bin/test_folder }
+        - { name: MacOS XCode - x86-64, os: macos-13,       folder: ./build/bin/,             zip: mac-x86-64.zip,    zipper: zip -r,     unzip: unzip -d ./,  copy: cp -r test_folder ./build/bin/test_folder }
+        - { name: Linux GCC,            os: ubuntu-24.04,   folder: ./build/bin/,             zip: ubuntu-gcc.zip,    zipper: zip -r,     unzip: unzip -d ./,  copy: cp -r test_folder ./build/bin/test_folder }
+        - { name: Linux Clang,          os: ubuntu-24.04,   folder: ./build/bin/,             zip: ubuntu-clang.zip,  zipper: zip -r,     unzip: unzip -d ./,  copy: cp -r test_folder ./build/bin/test_folder,       flags: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ }
         config:
         - { name: static, flags: -DBUILD_SHARED_LIBS=FALSE }
         # - { name: shared, flags: -DBUILD_SHARED_LIBS=TRUE }
@@ -33,6 +33,8 @@ jobs:
         # - { name: Debug,          flags: -DCMAKE_BUILD_TYPE=Debug }
         # - { name: RelWithDebInfo, flags: -DCMAKE_BUILD_TYPE=RelWithDebInfo }
         # - { name: MinSizeRel,     flags: -DCMAKE_BUILD_TYPE=MinSizeRel }
+        opencv:
+        - { zip_version: 4.11.0.zip, folder_version: opencv-4.11.0  }
 
     steps:
 
@@ -68,35 +70,35 @@ jobs:
       run: vcpkg install openblas
 
     - name: download OpenCV source
-      run: curl -L -o 4.11.0.zip https://github.com/opencv/opencv/archive/refs/tags/4.11.0.zip
+      run: curl -L -o ${{ matrix.opencv.zip_version }} https://github.com/opencv/opencv/archive/refs/tags/${{ matrix.opencv.zip_version }}
 
     - name: extract OpenCV sources
-      run: tar -xf 4.11.0.zip -C .
+      run: ${{ matrix.platform.unzip }} ${{ matrix.opencv.zip_version }}
 
     - name: clone OpenCV-Contrib
       run: git clone https://github.com/opencv/opencv_contrib.git
        
     - name: cmake config OpenCV
       run: |
-        cd opencv-4.11.0
+        cd ${{ matrix.opencv.folder_version }}
         cmake -S . -B build ${{matrix.platform.flags}} ${{matrix.config.flags}} ${{matrix.build.flags}} -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DCMAKE_INSTALL_PREFIX="build/install" -DBUILD_PERF_TESTS=OFF -DBUILD_TESTS=OFF -DBUILD_DOCS=OFF  -DWITH_CUDA=OFF -DBUILD_EXAMPLES=OFF -DINSTALL_CREATE_DISTRIB=ON
 
     - name: cmake Build OpenCV
       run: |
-        cd opencv-4.11.0
+        cd ${{ matrix.opencv.folder_version }}
         cmake --build build --config Release
 
     - name: cmake Install OpenCV
       run: |
-        cd opencv-4.11.0
+        cd ${{ matrix.opencv.folder_version }}
         cmake --build build --target install --config Release
 
     - name: verify OpenCV installation
       if: runner.os == 'Windows'
-      run: dir opencv-4.11.0\build\install
+      run: dir ${{ matrix.opencv.folder_version }}\build\install
 
     - name: configure project
-      run: cmake -S . -B build -DCMAKE_INSTALL_PREFIX=install -DOpenCV_DIR="opencv-4.11.0/build/install" ${{matrix.platform.flags}} ${{matrix.config.flags}} ${{matrix.build.flags}}
+      run: cmake -S . -B build -DCMAKE_INSTALL_PREFIX=install -DOpenCV_DIR="${{ matrix.opencv.folder_version }}/build/install" ${{matrix.platform.flags}} ${{matrix.config.flags}} ${{matrix.build.flags}}
 
     - name: Build ${{matrix.platform.bin}} executable
       run: cmake --build build --config ${{matrix.build.name}}
@@ -148,16 +150,16 @@ jobs:
       if: runner.os == 'Windows'
       shell: pwsh
       run: |
-        robocopy /E /COPYALL yolo11n.torchscript ${{ matrix.platform.folder }}
+        robocopy . ${{ matrix.platform.folder }} yolo11n.torchscript /COPYALL
         if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) { exit $LASTEXITCODE }
 
-        robocopy /E /COPYALL yolo11n-96-in-dim.torchscript ${{ matrix.platform.folder }}
+        robocopy . ${{ matrix.platform.folder }} yolo11n-96-in-dim.torchscript /COPYALL
         if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) { exit $LASTEXITCODE }
 
-        robocopy /E /COPYALL yolo11n-160-in-dim.torchscript ${{ matrix.platform.folder }}
+        robocopy . ${{ matrix.platform.folder }} yolo11n-160-in-dim.torchscript /COPYALL
         if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) { exit $LASTEXITCODE }
 
-        robocopy /E /COPYALL yolo11n-320-in-dim.torchscript ${{ matrix.platform.folder }}
+        robocopy . ${{ matrix.platform.folder }} yolo11n-320-in-dim.torchscript /COPYALL
         if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) { exit $LASTEXITCODE }
         
         exit 0
