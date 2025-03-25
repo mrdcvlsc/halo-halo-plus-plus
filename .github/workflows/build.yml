@@ -67,10 +67,11 @@ jobs:
       continue-on-error: true
       run: vcpkg install openblas
 
-    - name: download OpenCV and Extract sources
-      run: |
-        curl -L -o 4.11.0.zip https://github.com/opencv/opencv/archive/refs/tags/4.11.0.zip
-        tar -xf "4.11.0.zip" -C ".\"
+    - name: download OpenCV source
+      run: curl -L -o 4.11.0.zip https://github.com/opencv/opencv/archive/refs/tags/4.11.0.zip
+
+    - name: extract OpenCV sources
+      run: tar -xf 4.11.0.zip -C .
 
     - name: clone OpenCV-Contrib
       run: git clone https://github.com/opencv/opencv_contrib.git
@@ -147,16 +148,16 @@ jobs:
       if: runner.os == 'Windows'
       shell: pwsh
       run: |
-        robocopy yolo11n.torchscript ${{ matrix.platform.folder }}
+        robocopy /E /COPYALL yolo11n.torchscript ${{ matrix.platform.folder }}
         if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) { exit $LASTEXITCODE }
 
-        robocopy yolo11n-96-in-dim.torchscript ${{ matrix.platform.folder }}
+        robocopy /E /COPYALL yolo11n-96-in-dim.torchscript ${{ matrix.platform.folder }}
         if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) { exit $LASTEXITCODE }
 
-        robocopy yolo11n-160-in-dim.torchscript ${{ matrix.platform.folder }}
+        robocopy /E /COPYALL yolo11n-160-in-dim.torchscript ${{ matrix.platform.folder }}
         if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) { exit $LASTEXITCODE }
 
-        robocopy yolo11n-320-in-dim.torchscript ${{ matrix.platform.folder }}
+        robocopy /E /COPYALL yolo11n-320-in-dim.torchscript ${{ matrix.platform.folder }}
         if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) { exit $LASTEXITCODE }
         
         exit 0
