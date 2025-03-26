@@ -58,7 +58,7 @@ jobs:
 
     - name: install linux SFML dependencies
       if: runner.os == 'Linux'
-      run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libxi-dev libudev-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev libfreetype-dev libopenblas-dev
+      run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libxi-dev libudev-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev libfreetype-dev libopenblas-dev libgtk2.0-dev
 
     - name: Install MacOS Dependencies
       if: runner.os == 'macOS'
@@ -81,7 +81,7 @@ jobs:
     - name: cmake config OpenCV
       run: |
         cd ${{ matrix.opencv.folder_version }}
-        cmake -S . -B build ${{matrix.platform.flags}} ${{matrix.config.flags}} ${{matrix.build.flags}} -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DCMAKE_INSTALL_PREFIX="build/install" -DBUILD_PERF_TESTS=OFF -DBUILD_TESTS=OFF -DBUILD_DOCS=OFF  -DWITH_CUDA=OFF -DBUILD_EXAMPLES=OFF -DINSTALL_CREATE_DISTRIB=ON
+        cmake -S . -B build ${{matrix.platform.flags}} ${{matrix.config.flags}} ${{matrix.build.flags}} -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DCMAKE_INSTALL_PREFIX="build/install" -DBUILD_PERF_TESTS=OFF -DBUILD_TESTS=OFF -DBUILD_DOCS=OFF -DWITH_CUDA=OFF -DBUILD_EXAMPLES=OFF -DINSTALL_CREATE_DISTRIB=ON
 
     - name: cmake Build OpenCV
       run: |
@@ -94,11 +94,10 @@ jobs:
         cmake --build build --target install --config Release
 
     - name: verify OpenCV installation
-      if: runner.os == 'Windows'
-      run: dir ${{ matrix.opencv.folder_version }}\build\install
+      run: tree ${{ matrix.opencv.folder_version }}\build\install
 
     - name: configure project
-      run: cmake -S . -B build -DCMAKE_INSTALL_PREFIX=install -DOpenCV_DIR=./${{ matrix.opencv.folder_version }}/build/install ${{matrix.platform.flags}} ${{matrix.config.flags}} ${{matrix.build.flags}}
+      run: cmake -S . -B build -DOpenCV_DIR=${{ matrix.opencv.folder_version }}\\build\\install ${{matrix.platform.flags}} ${{matrix.config.flags}} ${{matrix.build.flags}}
 
     - name: Build ${{matrix.platform.bin}} executable
       run: cmake --build build --config ${{matrix.build.name}}
