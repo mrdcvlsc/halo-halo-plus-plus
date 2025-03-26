@@ -2,10 +2,12 @@ cmake_minimum_required(VERSION 3.28)
 
 project(sfml_opencv_libtorch_project)
 
-message(STATUS "BUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}")
-message(STATUS "CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
-message(STATUS "CPU_BASELINE : ${CPU_BASELINE}")
-message(STATUS "CPU_DISPATCH : ${CPU_DISPATCH}")
+message(STATUS "BUILD_SHARED_LIBS : ${BUILD_SHARED_LIBS}")
+message(STATUS "CMAKE_BUILD_TYPE  : ${CMAKE_BUILD_TYPE}")
+message(STATUS "CPU_BASELINE      : ${CPU_BASELINE}")
+message(STATUS "CPU_DISPATCH      : ${CPU_DISPATCH}")
+message(STATUS "OpenCV_DIR        : ${OpenCV_DIR}")
+message(STATUS "Eigen3_DIR        : ${Eigen3_DIR}")
 
 # ------------------------------------------------------------------
 # INITIAL SETUPS
@@ -54,6 +56,9 @@ endif()
 #     message(STATUS "PRINT1: Configuring for Clang-CL on Windows")
 #     set(CPU_BASELINE "SSE;SSE2;SSE3;SSE4_1;SSE4_2;POPCNT")
 # endif()
+
+# find_package(Eigen3 REQUIRED)
+# find_package(Iconv)
 
 message(STATUS "CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
 message(STATUS "CMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
