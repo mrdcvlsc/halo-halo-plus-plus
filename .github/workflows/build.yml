@@ -45,11 +45,11 @@ jobs:
       run: |
         python3 --version
 
-    - name: install numpy and torch if possible
-      continue-on-error: true
-      run: |
-        python3 --version
-        pip install numpy torch torchvision torchaudio
+    # - name: install numpy and torch if possible
+    #   continue-on-error: true
+    #   run: |
+    #     python3 --version
+    #     pip install numpy torch torchvision torchaudio
 
     - name: install ultralytics
       run: |
@@ -59,15 +59,6 @@ jobs:
     - name: install linux SFML dependencies
       if: runner.os == 'Linux'
       run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libxi-dev libudev-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev libfreetype-dev libopenblas-dev libgtk2.0-dev
-
-    - name: Install MacOS Dependencies
-      if: runner.os == 'macOS'
-      run: brew install tree openblas
-
-    - name: install openblas in windows if possible
-      if: runner.os == 'Windows'
-      continue-on-error: true
-      run: vcpkg install openblas
 
     - name: download OpenCV source
       run: curl -L -o ${{ matrix.opencv.zip_version }} https://github.com/opencv/opencv/archive/refs/tags/${{ matrix.opencv.zip_version }}
@@ -81,7 +72,7 @@ jobs:
     - name: cmake config OpenCV
       run: |
         cd ${{ matrix.opencv.folder_version }}
-        cmake -S . -B build ${{matrix.platform.flags}} ${{matrix.config.flags}} ${{matrix.build.flags}} -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DCMAKE_INSTALL_PREFIX="build/install" -DBUILD_PERF_TESTS=OFF -DBUILD_TESTS=OFF -DBUILD_DOCS=OFF -DWITH_CUDA=OFF -DBUILD_EXAMPLES=OFF -DINSTALL_CREATE_DISTRIB=ON
+        cmake -S . -B build ${{matrix.platform.flags}} ${{matrix.config.flags}} ${{matrix.build.flags}} -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DCMAKE_INSTALL_PREFIX="build/install" -DBUILD_PERF_TESTS=OFF -DBUILD_TESTS=OFF -DBUILD_DOCS=OFF -DWITH_CUDA=OFF -DBUILD_EXAMPLES=OFF -DINSTALL_CREATE_DISTRIB=ON -DBUILD_opencv_apps=OFF -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF -DBUILD_OPENEXR=OFF -DWITH_OPENEXR=OFF -DBUILD_JASPER=OFF -DWITH_JASPER=OFF -DBUILD_WEBP=OFF -DWITH_WEBP=OFF -DBUILD_TIFF=OFF -DWITH_TIFF=OFF -DBUILD_JPEG=ON -DBUILD_JPEG_TURBO_DISABLE=OFF -DWITH_JPEG=ON -DBUILD_OPENJPEG=OFF -DWITH_OPENJPEG=OFF -DBUILD_SPNG=OFF -DWITH_SPNG=OFF -DWITH_JPEGXL=OFF -DWITH_IMGCODEC_HDR=OFF -DWITH_IMGCODEC_SUNRASTER=OFF -DWITH_IMGCODEC_PXM=OFF -DWITH_IMGCODEC_PFM=OFF -DWITH_ANDROID_MEDIANDK=OFF -DWITH_AVIF=OFF -DBUILD_JAVA=OFF -DBUILD_opencv_java_bindings_generator=OFF -DBUILD_FAT_JAVA_LIB=OFF -DBUILD_opencv_js=OFF -DBUILD_opencv_js_bindings_generator=OFF -DWITH_TESSERACT=OFF -DBUILD_gen_opencv_python_source=OFF -DBUILD_opencv_python2=OFF -DBUILD_opencv_python3=OFF -DBUILD_opencv_python_tests=OFF  -DCPU_BASELINE=SSE3 -DCPU_DISPATCH=SSE4_1,SSE4_2 -DENABLE_LTO=ON -DBUILD_opencv_viz=OFF -DBUILD_opencv_bgsegm=ON -DWITH_PROTOBUF=ON -DBUILD_PROTOBUF=ON -DBUILD_opencv_dnn=ON -DBUILD_opencv_dnn_plugins=OFF -DBUILD_opencv_dnn_superres=OFF -DBUILD_opencv_dnn_objdetect=OFF -DBUILD_opencv_flann=OFF -DBUILD_opencv_intensity_transform=OFF -DBUILD_opencv_ml=OFF -DBUILD_opencv_phase_unwrapping=OFF -DBUILD_opencv_photo=OFF -DBUILD_opencv_plot=OFF -DBUILD_opencv_quality=OFF -DBUILD_opencv_reg=OFF -DBUILD_opencv_signal=OFF -DBUILD_opencv_surface_matching=OFF -DBUILD_opencv_xphoto=OFF -DBUILD_opencv_alphamat=OFF -DBUILD_opencv_features2d=OFF -DBUILD_opencv_freetype=OFF -DBUILD_opencv_fuzzy=OFF -DBUILD_opencv_hfs=OFF -DBUILD_opencv_img_hash=OFF -DBUILD_IlmImf=OFF -DBUILD_opencv_line_descriptor=OFF -DBUILD_opencv_saliency=OFF -DBUILD_opencv_text=OFF -DBUILD_opencv_calib3d=OFF -DBUILD_opencv_datasets=OFF -DBUILD_opencv_mcc=OFF -DBUILD_opencv_objdetect=OFF -DBUILD_opencv_rapid=OFF -DBUILD_opencv_rgbd=OFF -DBUILD_opencv_shape=OFF -DBUILD_opencv_structured_light=OFF -DBUILD_opencv_videostab=OFF -DBUILD_opencv_wechat_qrcode=OFF -DBUILD_opencv_xfeatures2d=OFF -DBUILD_opencv_ximgproc=OFF -DBUILD_opencv_xobjdetect=OFF -DBUILD_opencv_waldboost_detector=OFF -DBUILD_opencv_aruco=OFF -DBUILD_opencv_bioinspired=OFF -DBUILD_opencv_ccalib=OFF -DBUILD_opencv_dpm=OFF -DBUILD_opencv_face=OFF -DWITH_ADE=OFF -DBUILD_opencv_superres=OFF -DBUILD_opencv_tracking=OFF -DBUILD_opencv_stereo=OFF -DBUILD_opencv_annotation=OFF -DBUILD_opencv_visualisation=OFF -DBUILD_opencv_interactive-calibration=OFF -DBUILD_opencv_model_diagnostics=OFF
 
     - name: cmake Build OpenCV
       run: |
@@ -94,10 +85,10 @@ jobs:
         cmake --build build --target install --config Release
 
     - name: verify OpenCV installation
-      run: tree ${{ matrix.opencv.folder_version }}\build\install
+      run: tree ${{ matrix.opencv.folder_version }}/build/install
 
     - name: configure project
-      run: cmake -S . -B build -DOpenCV_DIR=${{ matrix.opencv.folder_version }}\\build\\install ${{matrix.platform.flags}} ${{matrix.config.flags}} ${{matrix.build.flags}}
+      run: cmake -S . -B build -DOpenCV_DIR="${{ matrix.opencv.folder_version }}/build/install" ${{matrix.platform.flags}} ${{matrix.config.flags}} ${{matrix.build.flags}}
 
     - name: Build ${{matrix.platform.bin}} executable
       run: cmake --build build --config ${{matrix.build.name}}
