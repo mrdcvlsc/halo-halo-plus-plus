@@ -190,10 +190,19 @@ if (MSVC)
 endif (MSVC)
 
 if (BUILD_SHARED_LIBS)
+    file(GLOB OPENCV_BIN_DLL "${OpenCV_INSTALL_PATH}/bin/*.dll")
+    file(GLOB OPENCV_BIN_SO  "${OpenCV_INSTALL_PATH}/bin/*.so")
+    file(GLOB OPENCV_LIB_DLL "${OpenCV_INSTALL_PATH}/lib/*.dll")
+    file(GLOB OPENCV_LIB_SO  "${OpenCV_INSTALL_PATH}/lib/*.so")
+
+    list(APPEND OPENCV_BIN_DLL ${OPENCV_BIN_SO})
+    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_DLL})
+    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_SO})
+
     add_custom_command(TARGET live_cam_object_detection
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${OpenCV_INSTALL_PATH}/bin"
+        ${OPENCV_BIN_DLL}
         $<TARGET_FILE_DIR:live_cam_object_detection>
     )
 endif()
@@ -229,10 +238,19 @@ set_property(TARGET live_cam_motion_detection PROPERTY CXX_STANDARD 17)
 # endif (MSVC)
 
 if (BUILD_SHARED_LIBS)
+    file(GLOB OPENCV_BIN_DLL "${OpenCV_INSTALL_PATH}/bin/*.dll")
+    file(GLOB OPENCV_BIN_SO  "${OpenCV_INSTALL_PATH}/bin/*.so")
+    file(GLOB OPENCV_LIB_DLL "${OpenCV_INSTALL_PATH}/lib/*.dll")
+    file(GLOB OPENCV_LIB_SO  "${OpenCV_INSTALL_PATH}/lib/*.so")
+
+    list(APPEND OPENCV_BIN_DLL ${OPENCV_BIN_SO})
+    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_DLL})
+    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_SO})
+    
     add_custom_command(TARGET live_cam_motion_detection
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${OpenCV_INSTALL_PATH}/bin"
+        ${OPENCV_BIN_DLL}
         $<TARGET_FILE_DIR:live_cam_motion_detection>
     )
 endif()
@@ -267,10 +285,19 @@ if (MSVC)
 endif (MSVC)
 
 if (BUILD_SHARED_LIBS)
+    file(GLOB OPENCV_BIN_DLL "${OpenCV_INSTALL_PATH}/bin/*.dll")
+    file(GLOB OPENCV_BIN_SO  "${OpenCV_INSTALL_PATH}/bin/*.so")
+    file(GLOB OPENCV_LIB_DLL "${OpenCV_INSTALL_PATH}/lib/*.dll")
+    file(GLOB OPENCV_LIB_SO  "${OpenCV_INSTALL_PATH}/lib/*.so")
+
+    list(APPEND OPENCV_BIN_DLL ${OPENCV_BIN_SO})
+    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_DLL})
+    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_SO})
+    
     add_custom_command(TARGET draw_bounding_box
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${OpenCV_INSTALL_PATH}/bin"
+        ${OPENCV_BIN_DLL}
         $<TARGET_FILE_DIR:draw_bounding_box>
     )
 endif()
