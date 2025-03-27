@@ -31,7 +31,10 @@ if(MSVC)
     message(STATUS "CONFIG=${CONFIG}")
 endif()
 
-if(APPLE)    
+if(APPLE)
+    find_package(Eigen3)
+    find_package(Iconv)
+
     if(BUILD_SHARED_LIBS)
         set(CMAKE_MACOSX_RPATH ON)
         set(CMAKE_INSTALL_NAME_DIR @rpath)
