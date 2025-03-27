@@ -2,13 +2,6 @@ cmake_minimum_required(VERSION 3.28)
 
 project(sfml_opencv_libtorch_project)
 
-message(STATUS "BUILD_SHARED_LIBS : ${BUILD_SHARED_LIBS}")
-message(STATUS "CMAKE_BUILD_TYPE  : ${CMAKE_BUILD_TYPE}")
-message(STATUS "CPU_BASELINE      : ${CPU_BASELINE}")
-message(STATUS "CPU_DISPATCH      : ${CPU_DISPATCH}")
-message(STATUS "OpenCV_DIR        : ${OpenCV_DIR}")
-message(STATUS "Eigen3_DIR        : ${Eigen3_DIR}")
-
 # ------------------------------------------------------------------
 # INITIAL SETUPS
 # ------------------------------------------------------------------
@@ -47,22 +40,32 @@ if(APPLE)
     endif()
 endif()
 
-# if (CMAKE_GENERATOR MATCHES "Visual Studio" AND CMAKE_VS_PLATFORM_TOOLSET STREQUAL "ClangCL")
-#     message(STATUS "PRINT0: Configuring for Clang-CL on Windows")
-#     set(CPU_BASELINE "SSE;SSE2;SSE3;SSE4_1;SSE4_2;POPCNT")
-# endif()
+if (CMAKE_GENERATOR MATCHES "Visual Studio" AND CMAKE_VS_PLATFORM_TOOLSET STREQUAL "ClangCL")
+    message(STATUS "PRINT0: Configuring for Clang-CL on Windows")
+    set(CPU_BASELINE SSE3)
+    set(CPU_DISPATCH "SSE4_1;SSE4_2;POPCNT;FP16;AVX;AVX2")
+endif()
 
-# if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC")
-#     message(STATUS "PRINT1: Configuring for Clang-CL on Windows")
-#     set(CPU_BASELINE "SSE;SSE2;SSE3;SSE4_1;SSE4_2;POPCNT")
-# endif()
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC")
+    message(STATUS "PRINT1: Configuring for Clang-CL on Windows")
+    set(CPU_DISPATCH "SSE4_1;SSE4_2;POPCNT;FP16;AVX;AVX2")
+endif()
 
-# find_package(Eigen3 REQUIRED)
-# find_package(Iconv)
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    find_package(Eigen3)
+    find_package(Iconv)
+endif ()
 
-message(STATUS "CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
-message(STATUS "CMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
-message(STATUS "CPU_BASELINE=${CPU_BASELINE}")
+message(STATUS "BUILD_SHARED_LIBS : ${BUILD_SHARED_LIBS}")
+message(STATUS "CMAKE_BUILD_TYPE  : ${CMAKE_BUILD_TYPE}")
+message(STATUS "CPU_BASELINE      : ${CPU_BASELINE}")
+message(STATUS "CPU_DISPATCH      : ${CPU_DISPATCH}")
+message(STATUS "OpenCV_DIR        : ${OpenCV_DIR}")
+message(STATUS "Eigen3_DIR        : ${Eigen3_DIR}")
+message(STATUS "CMAKE_CXX_COMPILER : ${CMAKE_CXX_COMPILER}")
+message(STATUS "CMAKE_C_COMPILER   : ${CMAKE_C_COMPILER}")
+message(STATUS "CPU_BASELINE       : ${CPU_BASELINE}")
+message(STATUS "CPU_DISPATCH       : ${CPU_DISPATCH}")
 
 # ------------------------------------------------------------------
 # SFML
