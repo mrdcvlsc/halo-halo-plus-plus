@@ -12,22 +12,28 @@ set(CMAKE_CXX_STANDARD 17)
 
 if(NOT BUILD_SHARED_LIBS)
     set(OpenCV_STATIC ON)
+    set(OpenCV_SHARED OFF)
+else()
+    set(OpenCV_STATIC OFF)
+    set(OpenCV_SHARED ON)
 endif()
 
 if(MSVC)
     if(BUILD_SHARED_LIBS)
         set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
+        add_compile_options(
+            $<$<CONFIG:Release>:/MD>
+            $<$<CONFIG:Debug>:/MDd>
+        )
     else()
         set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+        add_compile_options(
+            $<$<CONFIG:Release>:/MT>
+            $<$<CONFIG:Debug>:/MTd>
+        )
     endif()
 
     message(STATUS "CMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY}")
-
-    add_compile_options(
-        $<$<CONFIG:Release>:/MT>
-        $<$<CONFIG:Debug>:/MTd>
-    )
-
     message(STATUS "CONFIG=${CONFIG}")
 endif()
 
@@ -59,16 +65,16 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     find_package(Iconv)
 endif ()
 
-message(STATUS "BUILD_SHARED_LIBS  : ${BUILD_SHARED_LIBS}")
-message(STATUS "CMAKE_BUILD_TYPE   : ${CMAKE_BUILD_TYPE}")
-message(STATUS "CPU_BASELINE       : ${CPU_BASELINE}")
-message(STATUS "CPU_DISPATCH       : ${CPU_DISPATCH}")
-message(STATUS "OpenCV_DIR         : ${OpenCV_DIR}")
-message(STATUS "Eigen3_DIR         : ${Eigen3_DIR}")
-message(STATUS "CMAKE_CXX_COMPILER : ${CMAKE_CXX_COMPILER}")
-message(STATUS "CMAKE_C_COMPILER   : ${CMAKE_C_COMPILER}")
-message(STATUS "CPU_BASELINE       : ${CPU_BASELINE}")
-message(STATUS "CPU_DISPATCH       : ${CPU_DISPATCH}")
+message("============================================================")
+message(STATUS "BUILD_SHARED_LIBS   : ${BUILD_SHARED_LIBS}")
+message(STATUS "CMAKE_BUILD_TYPE    : ${CMAKE_BUILD_TYPE}")
+message(STATUS "CPU_BASELINE        : ${CPU_BASELINE}")
+message(STATUS "CPU_DISPATCH        : ${CPU_DISPATCH}")
+message(STATUS "Eigen3_DIR          : ${Eigen3_DIR}")
+message(STATUS "CMAKE_CXX_COMPILER  : ${CMAKE_CXX_COMPILER}")
+message(STATUS "CMAKE_C_COMPILER    : ${CMAKE_C_COMPILER}")
+message(STATUS "CPU_BASELINE        : ${CPU_BASELINE}")
+message(STATUS "CPU_DISPATCH        : ${CPU_DISPATCH}")
 
 # ------------------------------------------------------------------
 # SFML
@@ -89,6 +95,9 @@ FetchContent_MakeAvailable(SFML)
 
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
+
+message(STATUS "OpenCV_DIR          : ${OpenCV_DIR}")
+message(STATUS "OpenCV_INSTALL_PATH : ${OpenCV_INSTALL_PATH}")
 
 # ------------------------------------------------------------------
 # LIBTORCH
@@ -146,6 +155,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
 # ------------------------------------------------------------------
 
+message("============================================================")
 
 # ==================================================================
 # live_cam_object_detection (OpenCV + libtorch)
@@ -179,6 +189,15 @@ if (MSVC)
                         $<TARGET_FILE_DIR:live_cam_object_detection>)
 endif (MSVC)
 
+if (BUILD_SHARED_LIBS)
+    add_custom_command(TARGET live_cam_object_detection
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${OpenCV_INSTALL_PATH}/bin"
+        $<TARGET_FILE_DIR:live_cam_object_detection>
+    )
+endif()
+
 # ==================================================================
 # live_cam_motion_detection (OpenCV only)
 # ==================================================================
@@ -209,6 +228,14 @@ set_property(TARGET live_cam_motion_detection PROPERTY CXX_STANDARD 17)
 #                             $<TARGET_FILE_DIR:live_cam_motion_detection>)
 # endif (MSVC)
 
+if (BUILD_SHARED_LIBS)
+    add_custom_command(TARGET live_cam_motion_detection
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${OpenCV_INSTALL_PATH}/bin"
+        $<TARGET_FILE_DIR:live_cam_motion_detection>
+    )
+endif()
 
 # ==================================================================
 # draw_bounding_box (OpenCV + libtorch)
@@ -238,6 +265,15 @@ if (MSVC)
                             ${TORCH_DLLS}
                             $<TARGET_FILE_DIR:draw_bounding_box>)
 endif (MSVC)
+
+if (BUILD_SHARED_LIBS)
+    add_custom_command(TARGET draw_bounding_box
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${OpenCV_INSTALL_PATH}/bin"
+        $<TARGET_FILE_DIR:draw_bounding_box>
+    )
+endif()
 
 # ==================================================================
 
