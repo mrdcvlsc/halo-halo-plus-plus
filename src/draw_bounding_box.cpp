@@ -129,9 +129,6 @@ int main(int argc, char **argv)
     if (torch::cuda::is_available()) {
         device = torch::Device(torch::kCUDA);
         std::cout << "using device                  : CUDA" << '\n';
-    } else if (torch::mps::is_available()) {
-        device = torch::Device(torch::kMPS);
-        std::cout << "using device                  : MPS" << '\n';
     } else {
         std::cout << "using device                  : CPU" << '\n';
     }

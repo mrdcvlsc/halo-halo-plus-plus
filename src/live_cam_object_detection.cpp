@@ -117,8 +117,6 @@ int main(int argc, char **argv)
 
     if (torch::cuda::is_available()) {
         device = torch::Device(torch::kCUDA);
-    } else if (torch::mps::is_available()) {
-        device = torch::Device(torch::kMPS);
     }
 
     model.to(device);
