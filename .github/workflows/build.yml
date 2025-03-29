@@ -42,19 +42,22 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: install ultralytics
-      run: |
-        python3 --version
-        pip install ultralytics
-
     - name: Install MacOS Dependencies
       if: runner.os == 'macOS'
-      run: brew install tree
+      run: |
+        brew update
+        brew upgrade
+        brew install tree
 
     - name: install linux ubuntu SFML dependencies
       if: runner.os == 'Linux'
       run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libxi-dev libudev-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev libfreetype-dev libopenblas-dev libgtk2.0-dev
 
+    - name: install ultralytics
+      run: |
+        python --version
+        pip install ultralytics
+    
     - name: download OpenCV source
       run: curl -L -o ${{ matrix.opencv.zip_version }} https://github.com/opencv/opencv/archive/refs/tags/${{ matrix.opencv.zip_version }}
 
@@ -113,6 +116,8 @@ jobs:
       run: python pt_to_torchscript.py
 
     - name: run test programs
+      env:
+        DYLD_LIBRARY_PATH: ./opencv-4.11.0/build/install/lib/
       run: make test EXECUTABLE=${{ matrix.platform.folder }}${{ matrix.platform.bin }}draw_bounding_box${{ matrix.platform.extension }}
 
     - name: copy test folder to bin directory
