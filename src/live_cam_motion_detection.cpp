@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <cstdlib>
 #include <iostream>
 #include <iomanip>
@@ -102,6 +103,9 @@ int main(int argc, char **argv)
     cv::VideoCapture cap(highest_resolution_camera->camera_index);
     int              current_camera_index = 0;
 
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, static_cast<double>(highest_resolution_camera->width));
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, static_cast<double>(highest_resolution_camera->height));
+
     if (!cap.isOpened()) {
         std::cerr << "not capturing\n";
         return -1;
@@ -114,7 +118,9 @@ int main(int argc, char **argv)
     cv::Ptr<cv::BackgroundSubtractorMOG2> bg_subtractor =
       cv::createBackgroundSubtractorMOG2(history, sensitivity_threshold, is_detect_shadow_on);
 
-    cv::namedWindow("selected camera", cv::WINDOW_NORMAL);
+    std::string_view windows_name = "motion detection";
+
+    cv::namedWindow(windows_name.data(), cv::WINDOW_NORMAL);
     cv::Mat frame, fg_mask; // frame & foreground mask
 
     double previous_time = static_cast<double>(cv::getTickCount());
@@ -166,12 +172,12 @@ int main(int argc, char **argv)
             }
         }
 
-        if (motion_detected) {
+        if (motion_detected && is_enable_action) {
             if (alert_sound.getStatus() != sf::Sound::Status::Playing) {
                 alert_sound.play();
             }
 
-            debug_log("motion detected");
+            std::cout << "motion detected\n";
 
             std::string motion_frame_img = get_timestamp() + ".jpg";
 
@@ -185,21 +191,20 @@ int main(int argc, char **argv)
         fps_stream << "FPS: " << std::fixed << std::setprecision(1) << fps;
 
         if (-1 >= flip_value && flip_value <= 1) {
-            cv::Mat flipped_frame;
-            cv::flip(frame, flipped_frame, flip_value);
+            cv::Mat flip_frame;
+            cv::flip(frame, flip_frame, flip_value);
 
             cv::putText(
-              flipped_frame, fps_stream.str(), cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0),
-              2
+              flip_frame, fps_stream.str(), cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2
             );
 
-            cv::imshow("selected camera", flipped_frame);
+            cv::imshow(windows_name.data(), flip_frame);
         } else {
             cv::putText(
               frame, fps_stream.str(), cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2
             );
 
-            cv::imshow("selected camera", frame);
+            cv::imshow(windows_name.data(), frame);
         }
 
         int key = cv::waitKey(1);
@@ -208,9 +213,9 @@ int main(int argc, char **argv)
             bg_subtractor->clear();
             bg_subtractor = cv::createBackgroundSubtractorMOG2(history, sensitivity_threshold, is_detect_shadow_on);
 
-            debug_log(
-              "toggle shadow detection : " + std::string((is_detect_shadow_on) ? "true" : "false") + " -> " +
-              ((is_detect_shadow_on) ? "false" : "true")
+            printf(
+              "toggle shadow detection : %s -> %s\n", (is_detect_shadow_on) ? "true" : "false",
+              (is_detect_shadow_on) ? "false" : "true"
             );
 
             is_detect_shadow_on = !is_detect_shadow_on;

@@ -2,14 +2,14 @@
 640x640 - model's input
 ------------------------------
 
-1,215,433     ns : phase 1
+5,268,172     ns : phase 1
 13,789,534    ns : pre-process
 1,599,076,517 ns : feed model
-59,926        ns : transpose output
+80,625        ns : transpose output
 408,174,418   ns : get bounding boxes
 7,338         ns : non-max suppression
 6,447,859     ns : draw labels and bounding boxes
-100           ns : clear resources
+337           ns : clear resources
 
 ------------------------------
 320x320 - model's input

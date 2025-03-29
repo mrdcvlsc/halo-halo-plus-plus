@@ -168,6 +168,7 @@ add_executable(live_cam_object_detection
     src/preprocess_frame.cpp
     src/get_class_color.cpp
     src/logger.cpp
+    src/benchmark.cpp
 )
 
 target_link_libraries(live_cam_object_detection PRIVATE "${TORCH_LIBRARIES}")

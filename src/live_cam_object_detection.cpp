@@ -19,6 +19,7 @@
 #include "get_class_color.hpp"
 #include "get_cameras.hpp"
 #include "event_keys.hpp"
+#include "benchmark.hpp"
 
 std::vector<cv::Rect> origin_bounding_boxes;
 std::vector<float>    confidence_scores;
@@ -145,6 +146,9 @@ int main(int argc, char **argv)
     int              current_camera_index = 0;
     std::cout << "capturing from camera : " << highest_resolution_camera->camera_index << '\n';
 
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, static_cast<double>(highest_resolution_camera->width));
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, static_cast<double>(highest_resolution_camera->height));
+
     if (!cap.isOpened()) {
         std::cerr << "not capturing\n";
         return -1;
@@ -156,7 +160,9 @@ int main(int argc, char **argv)
         // cap.set(cv::CAP_PROP_BUFFERSIZE, 1);
     }
 
-    cv::namedWindow("selected camera", cv::WINDOW_NORMAL);
+    std::string_view windows_name = "object detection";
+
+    cv::namedWindow(windows_name.data(), cv::WINDOW_NORMAL);
     cv::Mat frame;
 
     double previous_time = static_cast<double>(cv::getTickCount());
@@ -173,8 +179,10 @@ int main(int argc, char **argv)
 
     bool is_enable_action = false;
 
+    Benchmark benchmark;
+
     while (true) {
-        auto start = std::chrono::system_clock::now();
+        benchmark.new_start();
 
         double current_time = static_cast<double>(cv::getTickCount());
         double time_elapsed = (current_time - previous_time) / cv::getTickFrequency();
@@ -191,9 +199,7 @@ int main(int argc, char **argv)
             throw std::runtime_error("detected an empty frame");
         }
 
-        auto end = std::chrono::system_clock::now();
-        auto dur = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-        std::cout << "phase 1 : " << dur.count() << "ns\n";
+        benchmark.done_with_print_ns("phase 1 : ");
 
         // ------------------------------------------------------
 
@@ -203,32 +209,27 @@ int main(int argc, char **argv)
         const float input_w = model_input_dim_size;
         const float input_h = model_input_dim_size;
 
-        start = std::chrono::system_clock::now();
+        benchmark.new_start();
         torch::Tensor input_tensor =
           preprocess_frame(frame, static_cast<int>(input_w), static_cast<int>(input_h), torch::kFloat32);
-        end = std::chrono::system_clock::now();
-        dur = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-        std::cout << "pre-process : " << dur.count() << "ns\n";
+        benchmark.done_with_print_ns("pre-process : ");
 
-        start = std::chrono::system_clock::now();
+        benchmark.new_start();
         torch::Tensor output = model.forward({input_tensor.to(device)}).toTensor().to(torch::kCPU);
-        end = std::chrono::system_clock::now();
-        dur = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-        std::cout << "feed model : " << dur.count() << "ns\n";
+        benchmark.done_with_print_ns("feed model : ");
 
-        start = std::chrono::system_clock::now();
+        benchmark.new_start();
+
         output = output.squeeze(0).transpose(0, 1); // squeeze -> [84,  8400], transpose -> [8400, 84]    // 123911ns
-        end = std::chrono::system_clock::now();
-        dur = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-        std::cout << "transpose output : " << dur.count() << "ns\n";
+        benchmark.done_with_print_ns("transpose output : ");
 
         int num_detections = output.size(0); // 8400
 
-        start = std::chrono::system_clock::now();
-        for (int i = 0; i < num_detections; ++i) {
-            auto class_scores = output[i].slice(0, 4, 84);
-            auto [max_score, max_index] = torch::max(class_scores, 0);
+        benchmark.new_start();
 
+        for (int i = 0; i < num_detections; ++i) {
+            auto class_scores = output[i].slice(0, 4, 84);             // 17,451 ns
+            auto [max_score, max_index] = torch::max(class_scores, 0); // 30,251 ns
             float confidence = max_score.item<float>();
 
             if (confidence >= confidence_threshold) {
@@ -262,13 +263,11 @@ int main(int argc, char **argv)
                 class_ids.push_back(class_id);
             }
         }
-        end = std::chrono::system_clock::now();
-        dur = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-        std::cout << "get bounding boxes : " << dur.count() << "ns\n";
+        benchmark.done_with_print_ns("get bounding boxes : ");
 
         std::vector<int> final_detection_indices;
 
-        start = std::chrono::system_clock::now();
+        benchmark.new_start();
 
         // remove duplicates bounding boxes
 
@@ -276,11 +275,10 @@ int main(int argc, char **argv)
           origin_bounding_boxes, confidence_scores, confidence_threshold, nms_threshold, final_detection_indices
         );
 
-        end = std::chrono::system_clock::now();
-        dur = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-        std::cout << "non-max suppression : " << dur.count() << "ns\n";
+        benchmark.done_with_print_ns("non-max suppression : ");
 
-        start = std::chrono::system_clock::now();
+        benchmark.new_start();
+
         for (int i: final_detection_indices) {
             cv::Rect origin_bounding_box = origin_bounding_boxes[i];
             float    confidence = confidence_scores[i];
@@ -320,19 +318,16 @@ int main(int argc, char **argv)
             label.resize(0);
         }
 
-        end = std::chrono::system_clock::now();
-        dur = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-        std::cout << "draw labels and bounding boxes : " << dur.count() << "ns\n";
+        benchmark.done_with_print_ns("draw labels and bounding boxes : ");
 
-        start = std::chrono::system_clock::now();
+        benchmark.new_start();
+
         origin_bounding_boxes.resize(0);
         confidence_scores.resize(0);
         class_ids.resize(0);
         final_detection_indices.resize(0);
 
-        end = std::chrono::system_clock::now();
-        dur = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-        std::cout << "clear resources : " << dur.count() << "ns\n";
+        benchmark.done_with_print_ns("clear resources : ");
 
         // ------------------------------------------------------
 
@@ -342,7 +337,7 @@ int main(int argc, char **argv)
 
         cv::putText(frame, fps_text, cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2);
 
-        cv::imshow("selected camera", frame);
+        cv::imshow(windows_name.data(), frame);
 
         int key = cv::waitKey(1);
 

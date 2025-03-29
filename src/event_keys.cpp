@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <iostream>
 
 #include "logger.hpp"
@@ -16,15 +17,15 @@ bool check_events(
 )
 {
     if (key == 'q' || key == 'Q' || key == 27) { // 'q' or 'ESC' to exit
-        debug_log("close exit through key");
+        printf("close exit through key\n");
         return true;
     }
 
     if (key == 'c' || key == 'C') {
-        debug_log(
-          "is_enable_action : " + std::string((is_enable_action) ? "true" : "false") + " -> " +
-          ((is_enable_action) ? "false" : "true")
+        printf(
+          "is_enable_action : %s -> %s\n", (is_enable_action) ? "true" : "false", (is_enable_action) ? "false" : "true"
         );
+
         is_enable_action = !is_enable_action;
     }
 
@@ -41,7 +42,7 @@ bool check_events(
         if (!cap.isOpened()) {
             std::cerr << "Failed to open camera index " << current_camera_index << "\n";
         } else {
-            debug_log("Switched to camera index " + std::to_string(current_camera_index));
+            printf("switched to camera index %d\n", current_camera_index);
         }
     }
 
@@ -58,7 +59,7 @@ bool check_events(
         if (!cap.isOpened()) {
             std::cerr << "Failed to open camera index " << current_camera_index << "\n";
         } else {
-            debug_log("Switched to camera index " + std::to_string(current_camera_index));
+            printf("Switched to camera index %d\n", current_camera_index);
         }
     }
 
