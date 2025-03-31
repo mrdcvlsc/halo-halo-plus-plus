@@ -17,15 +17,15 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-        - { name: Windows GCC,          os: windows-latest, folder: .\\build\\bin\\,          zip: windows-gcc.zip,  zipper: 7z a -tzip, flags: -G "Unix Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++, extension: .exe }
-        - { name: Windows MSVC-2019,    os: windows-2019,   folder: .\\build\\bin\\Release\\, zip: msvc-19.zip,      zipper: 7z a -tzip, unzip: tar -xf 4.11.0.zip -C .,                               copy: robocopy /E /COPYALL test_folder .\\build\\bin\\Release\\test_folder, flags: -G "Visual Studio 16 2019" -A x64, extension: .exe }
-        - { name: Windows MSVC-2022,    os: windows-2022,   folder: .\\build\\bin\\Release\\, zip: msvc-22.zip,      zipper: 7z a -tzip, unzip: tar -xf 4.11.0.zip -C .,                               copy: robocopy /E /COPYALL test_folder .\\build\\bin\\Release\\test_folder, flags: -G "Visual Studio 17 2022" -A x64, extension: .exe }
-        - { name: Windows Clang,        os: windows-2022,   folder: .\\build\\bin\\,          zip: clang.zip,        zipper: 7z a -tzip, unzip: tar -xf 4.11.0.zip -C .,                                 copy: robocopy /E /COPYALL test_folder .\\build\\bin\\test_folder,          flags: -G "Visual Studio 17 2022" -A x64 -T ClangCL , extension: .exe }
-        - { name: MacOS XCode - arm64,  os: macos-14,       folder: ./build/bin/,             zip: arm64-clang.zip,  zipper: zip -r,     unzip: unzip 4.11.0.zip -d ./,  cmake_conf: /lib/cmake/opencv4, copy: cp -r test_folder ./build/bin/test_folder }
-        - { name: MacOS XCode - x86-64, os: macos-13,       folder: ./build/bin/,             zip: x86-64-clang.zip, zipper: zip -r,     unzip: unzip 4.11.0.zip -d ./,  cmake_conf: /lib/cmake/opencv4, copy: cp -r test_folder ./build/bin/test_folder }
-        - { name: Ubuntu 24 - Clang,    os: ubuntu-24.04,   folder: ./build/bin/,             zip: clang.zip,        zipper: zip -r,     unzip: unzip 4.11.0.zip -d ./,  cmake_conf: /lib/cmake/opencv4, copy: cp -r test_folder ./build/bin/test_folder, flags: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ }
-        - { name: Ubuntu 22 - Clang,    os: ubuntu-22.04,   folder: ./build/bin/,             zip: clang.zip,        zipper: zip -r,     unzip: unzip 4.11.0.zip -d ./,  cmake_conf: /lib/cmake/opencv4, copy: cp -r test_folder ./build/bin/test_folder, flags: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ }
-        - { name: Ubuntu 20 - Clang,    os: ubuntu-20.04,   folder: ./build/bin/,             zip: clang.zip,        zipper: zip -r,     unzip: unzip 4.11.0.zip -d ./,  cmake_conf: /lib/cmake/opencv4, copy: cp -r test_folder ./build/bin/test_folder, flags: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ }
+        - { name: Windows-GCC,        os: windows-latest, folder: .\\build\\bin\\,          zip: windows-gcc.zip,  zipper: 7z a -tzip, unzip: tar -xf 4.11.0.zip -C .,                                 copy: robocopy /E /COPYALL test_folder .\\build\\bin\\test_folder,          flags: -G "Unix Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++, extension: .exe }
+        - { name: Windows-MSVC-2019,  os: windows-2019,   folder: .\\build\\bin\\Release\\, zip: msvc-19.zip,      zipper: 7z a -tzip, unzip: tar -xf 4.11.0.zip -C .,                                 copy: robocopy /E /COPYALL test_folder .\\build\\bin\\Release\\test_folder, flags: -G "Visual Studio 16 2019" -A x64,            extension: .exe }
+        - { name: Windows-MSVC-2022,  os: windows-2022,   folder: .\\build\\bin\\Release\\, zip: msvc-22.zip,      zipper: 7z a -tzip, unzip: tar -xf 4.11.0.zip -C .,                                 copy: robocopy /E /COPYALL test_folder .\\build\\bin\\Release\\test_folder, flags: -G "Visual Studio 17 2022" -A x64,            extension: .exe }
+        - { name: Windows-Clang,      os: windows-2022,   folder: .\\build\\bin\\,          zip: clang.zip,        zipper: 7z a -tzip, unzip: tar -xf 4.11.0.zip -C .,                                 copy: robocopy /E /COPYALL test_folder .\\build\\bin\\test_folder,          flags: -G "Visual Studio 17 2022" -A x64 -T ClangCL, extension: .exe }
+        - { name: MacOS-XCode-arm64,  os: macos-14,       folder: ./build/bin/,             zip: arm64-clang.zip,  zipper: zip -r,     unzip: unzip 4.11.0.zip -d ./,  cmake_conf: /lib/cmake/opencv4, copy: cp -r test_folder ./build/bin/test_folder }
+        - { name: MacOS-XCode-x86-64, os: macos-13,       folder: ./build/bin/,             zip: x86-64-clang.zip, zipper: zip -r,     unzip: unzip 4.11.0.zip -d ./,  cmake_conf: /lib/cmake/opencv4, copy: cp -r test_folder ./build/bin/test_folder }
+        - { name: Ubuntu-24-Clang,    os: ubuntu-24.04,   folder: ./build/bin/,             zip: clang.zip,        zipper: zip -r,     unzip: unzip 4.11.0.zip -d ./,  cmake_conf: /lib/cmake/opencv4, copy: cp -r test_folder ./build/bin/test_folder, flags: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ }
+        - { name: Ubuntu-22-Clang,    os: ubuntu-22.04,   folder: ./build/bin/,             zip: clang.zip,        zipper: zip -r,     unzip: unzip 4.11.0.zip -d ./,  cmake_conf: /lib/cmake/opencv4, copy: cp -r test_folder ./build/bin/test_folder, flags: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ }
+        - { name: Ubuntu-20-Clang,    os: ubuntu-20.04,   folder: ./build/bin/,             zip: clang.zip,        zipper: zip -r,     unzip: unzip 4.11.0.zip -d ./,  cmake_conf: /lib/cmake/opencv4, copy: cp -r test_folder ./build/bin/test_folder, flags: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ }
         config:
         - { name: static, flags: -DBUILD_SHARED_LIBS=OFF }
         - { name: shared, flags: -DBUILD_SHARED_LIBS=ON  }
@@ -79,6 +79,12 @@ jobs:
         # minimal library build
         cmake -S . -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }} ${{ matrix.build.flags }} -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DCMAKE_INSTALL_PREFIX="./build/install" -DBUILD_PERF_TESTS=OFF -DBUILD_TESTS=OFF -DBUILD_DOCS=OFF -DWITH_CUDA=OFF -DBUILD_EXAMPLES=OFF -DINSTALL_CREATE_DISTRIB=ON -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF -DOPENCV_FORCE_3RDPARTY_BUILD=ON
 
+    - name: cmake config OpenCV
+      if: ${{ matrix.platform.name }} == 'Windows-Clang'
+      shell: bash
+      run: |
+        cmake -S . -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }} ${{ matrix.build.flags }} -DCPU_BASELINE=SSE3 -DCPU_DISPATCH=SSE4_1,SSE4_2,POPCNT,FP16,AVX,AVX2 -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DCMAKE_INSTALL_PREFIX="./build/install" -DBUILD_PERF_TESTS=OFF -DBUILD_TESTS=OFF -DBUILD_DOCS=OFF -DWITH_CUDA=OFF -DBUILD_EXAMPLES=OFF -DINSTALL_CREATE_DISTRIB=ON -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF -DOPENCV_FORCE_3RDPARTY_BUILD=ON
+    
     - name: cmake Build OpenCV
       shell: bash
       run: |
@@ -92,6 +98,7 @@ jobs:
         cmake --build build --target install --config ${{ matrix.build.name }}
 
     - name: verify OpenCV installation
+      shell: bash
       run: tree ${{ matrix.opencv.folder_version }}/build/install
 
     - name: configure project
@@ -103,6 +110,7 @@ jobs:
       run: cmake --build build --config ${{ matrix.build.name }}
 
     - name: Display Build Tree
+      shell: bash
       run: tree build
 
     - name: create test folder
@@ -110,12 +118,14 @@ jobs:
       run: mkdir test_folder
       
     - name: download test files
+      shell: bash
       run: make download-test-files
 
     - name: download ultralytics YOLOv11n model for testing
       run: python pt_to_torchscript.py
 
     - name: run test programs
+      shell: bash
       env:
         DYLD_LIBRARY_PATH: ./opencv-4.11.0/build/install/lib/
       run: make test EXECUTABLE=${{ matrix.platform.folder }}${{ matrix.platform.bin }}draw_bounding_box${{ matrix.platform.extension }}
