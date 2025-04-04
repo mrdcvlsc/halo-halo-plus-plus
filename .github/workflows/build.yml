@@ -61,6 +61,9 @@ jobs:
     - name: extract OpenCV sources
       run: ${{ matrix.platform.unzip }}
 
+    - name: Get Cmake Version
+      run: cmake --version
+
     - name: clone OpenCV-Contrib
       run: git clone https://github.com/opencv/opencv_contrib.git
        
@@ -89,12 +92,13 @@ jobs:
         cmake --build build --target install --config ${{ matrix.build.name }}
 
     - name: verify OpenCV installation
-      shell: bash
       run: tree ${{ matrix.opencv.folder_version }}/build/install
 
     - name: configure project
       shell: bash
-      run: cmake -S . -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }} ${{ matrix.build.flags }} -DOpenCV_DIR="./${{ matrix.opencv.folder_version }}/build/install${{ matrix.platform.cmake_conf }}"
+      run: |
+        cmake --version
+        cmake -S . -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }} ${{ matrix.build.flags }} -DOpenCV_DIR="./${{ matrix.opencv.folder_version }}/build/install${{ matrix.platform.cmake_conf }}"
 
     - name: Build ${{ matrix.platform.bin }} executable
       shell: bash
