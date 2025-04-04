@@ -1,6 +1,9 @@
 # halo-halo++
 
 [![build](https://github.com/mrdcvlsc/halo-halo-plus-plus/actions/workflows/build.yml/badge.svg)](https://github.com/mrdcvlsc/halo-halo-plus-plus/actions/workflows/build.yml)
+[![win-clang](https://github.com/mrdcvlsc/halo-halo-plus-plus/actions/workflows/win-clang.yml/badge.svg)](https://github.com/mrdcvlsc/halo-halo-plus-plus/actions/workflows/win-clang.yml)
+[![win-gcc](https://github.com/mrdcvlsc/halo-halo-plus-plus/actions/workflows/win-gcc.yml/badge.svg)](https://github.com/mrdcvlsc/halo-halo-plus-plus/actions/workflows/win-gcc.yml)
+[![mac13-x86-64](https://github.com/mrdcvlsc/halo-halo-plus-plus/actions/workflows/mac13-x86-64.yml/badge.svg)](https://github.com/mrdcvlsc/halo-halo-plus-plus/actions/workflows/mac13-x86-64.yml)
 
 A simple C++ software template project for multimedia, machine learning,
 and computer vision tasks (and probably more in the future), this

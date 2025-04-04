@@ -1,4 +1,4 @@
-name: build
+name: win-clang
 
 on:
   push:
@@ -17,12 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-        - { name: Windows-MSVC-2019,  os: windows-2019,   folder: .\\build\\bin\\Release\\, zip: msvc-19.zip,      zipper: 7z a -tzip, unzip: tar -xf 4.11.0.zip -C .,                                 copy: robocopy /E /COPYALL test_folder .\\build\\bin\\Release\\test_folder, flags: -G "Visual Studio 16 2019" -A x64,            extension: .exe }
-        - { name: Windows-MSVC-2022,  os: windows-2022,   folder: .\\build\\bin\\Release\\, zip: msvc-22.zip,      zipper: 7z a -tzip, unzip: tar -xf 4.11.0.zip -C .,                                 copy: robocopy /E /COPYALL test_folder .\\build\\bin\\Release\\test_folder, flags: -G "Visual Studio 17 2022" -A x64,            extension: .exe }
-        - { name: MacOS-XCode-arm64,  os: macos-14,       folder: ./build/bin/,             zip: arm64-clang.zip,  zipper: zip -r,     unzip: unzip 4.11.0.zip -d ./,  cmake_conf: /lib/cmake/opencv4, copy: cp -r test_folder ./build/bin/test_folder }
-        - { name: Ubuntu-24-Clang,    os: ubuntu-24.04,   folder: ./build/bin/,             zip: clang.zip,        zipper: zip -r,     unzip: unzip 4.11.0.zip -d ./,  cmake_conf: /lib/cmake/opencv4, copy: cp -r test_folder ./build/bin/test_folder, flags: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ }
-        - { name: Ubuntu-22-Clang,    os: ubuntu-22.04,   folder: ./build/bin/,             zip: clang.zip,        zipper: zip -r,     unzip: unzip 4.11.0.zip -d ./,  cmake_conf: /lib/cmake/opencv4, copy: cp -r test_folder ./build/bin/test_folder, flags: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ }
-        - { name: Ubuntu-20-Clang,    os: ubuntu-20.04,   folder: ./build/bin/,             zip: clang.zip,        zipper: zip -r,     unzip: unzip 4.11.0.zip -d ./,  cmake_conf: /lib/cmake/opencv4, copy: cp -r test_folder ./build/bin/test_folder, flags: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ }
+        - { name: Windows-Clang,      os: windows-2022,   folder: .\\build\\bin\\,          zip: clang.zip,        zipper: 7z a -tzip, unzip: tar -xf 4.11.0.zip -C .,                                 copy: robocopy /E /COPYALL test_folder .\\build\\bin\\test_folder,          flags: -G "Visual Studio 17 2022" -A x64 -T ClangCL, extension: .exe }
         config:
         - { name: static, flags: -DBUILD_SHARED_LIBS=OFF }
         - { name: shared, flags: -DBUILD_SHARED_LIBS=ON  }
@@ -38,17 +33,6 @@ jobs:
 
     - name: Checkout Repository
       uses: actions/checkout@v4
-
-    - name: Install MacOS Dependencies
-      if: runner.os == 'macOS'
-      run: |
-        brew update
-        brew upgrade
-        brew install tree
-
-    - name: install linux ubuntu SFML dependencies
-      if: runner.os == 'Linux'
-      run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libxi-dev libudev-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev libfreetype-dev libopenblas-dev libgtk2.0-dev
 
     - name: install ultralytics
       run: |
@@ -68,14 +52,8 @@ jobs:
       shell: bash
       run: |
         cd ${{ matrix.opencv.folder_version }}
-        
-        # full opencv library build
-        # cmake -S . -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }} ${{ matrix.build.flags }} -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DCMAKE_INSTALL_PREFIX="./build/install" -DBUILD_PERF_TESTS=OFF -DBUILD_TESTS=OFF -DBUILD_DOCS=OFF -DWITH_CUDA=OFF -DBUILD_EXAMPLES=OFF -DINSTALL_CREATE_DISTRIB=ON -DBUILD_opencv_apps=OFF -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF -DOPENCV_FORCE_3RDPARTY_BUILD=ON
-        # cmake -S . -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }} ${{ matrix.build.flags }} -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DCMAKE_INSTALL_PREFIX="./build/install" -DBUILD_PERF_TESTS=OFF -DBUILD_TESTS=OFF -DBUILD_DOCS=OFF -DWITH_CUDA=OFF -DBUILD_EXAMPLES=OFF -DINSTALL_CREATE_DISTRIB=ON -DBUILD_opencv_apps=OFF -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF
-        
-        # minimal library build
-        cmake -S . -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }} ${{ matrix.build.flags }} -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DCMAKE_INSTALL_PREFIX="./build/install" -DBUILD_PERF_TESTS=OFF -DBUILD_TESTS=OFF -DBUILD_DOCS=OFF -DWITH_CUDA=OFF -DBUILD_EXAMPLES=OFF -DINSTALL_CREATE_DISTRIB=ON -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF -DOPENCV_FORCE_3RDPARTY_BUILD=ON
-
+        cmake -S . -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }} ${{ matrix.build.flags }} -DCPU_BASELINE=SSE3 -DCPU_DISPATCH=SSE4_1,SSE4_2,POPCNT,FP16,AVX,AVX2 -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DCMAKE_INSTALL_PREFIX="./build/install" -DBUILD_PERF_TESTS=OFF -DBUILD_TESTS=OFF -DBUILD_DOCS=OFF -DWITH_CUDA=OFF -DBUILD_EXAMPLES=OFF -DINSTALL_CREATE_DISTRIB=ON -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF -DOPENCV_FORCE_3RDPARTY_BUILD=ON
+    
     - name: cmake Build OpenCV
       shell: bash
       run: |
@@ -117,8 +95,6 @@ jobs:
 
     - name: run test programs
       shell: bash
-      env:
-        DYLD_LIBRARY_PATH: ./opencv-4.11.0/build/install/lib/
       run: make test EXECUTABLE=${{ matrix.platform.folder }}${{ matrix.platform.bin }}draw_bounding_box${{ matrix.platform.extension }}
 
     - name: copy test folder to bin directory
@@ -132,24 +108,7 @@ jobs:
           exit $LASTEXITCODE
         }
 
-    - name: copy YOLOv11n to the build/bin folder (Linux)
-      if: runner.os == 'Linux'
-      run: |
-        cp yolo11n.torchscript ${{ matrix.platform.folder }}
-        cp yolo11n-96-in-dim.torchscript ${{ matrix.platform.folder }}
-        cp yolo11n-160-in-dim.torchscript ${{ matrix.platform.folder }}
-        cp yolo11n-320-in-dim.torchscript ${{ matrix.platform.folder }}
-
-    - name: copy YOLOv11n to the build/bin folder (macOS)
-      if: runner.os == 'macOS'
-      run: |
-        cp yolo11n.torchscript ${{ matrix.platform.folder }}
-        cp yolo11n-96-in-dim.torchscript ${{ matrix.platform.folder }}
-        cp yolo11n-160-in-dim.torchscript ${{ matrix.platform.folder }}
-        cp yolo11n-320-in-dim.torchscript ${{ matrix.platform.folder }}
-
-    - name: copy YOLOv11n to the build/bin folder (Windows)
-      if: runner.os == 'Windows'
+    - name: copy YOLOv11n to the build/bin folder
       shell: pwsh
       run: |
         robocopy . ${{ matrix.platform.folder }} yolo11n.torchscript /COPYALL
