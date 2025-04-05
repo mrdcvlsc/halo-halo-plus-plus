@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-        - { name: Windows-GCC,        os: windows-latest, folder: .\\build\\bin\\,          zip: windows-gcc.zip,  zipper: 7z a -tzip, unzip: tar -xf 4.11.0.zip -C .,                                 copy: robocopy /E /COPYALL test_folder .\\build\\bin\\test_folder,          flags: -G "Unix Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++, extension: .exe }
+        - { name: Windows-GCC,        os: windows-2019, folder: .\\build\\bin\\,          zip: windows-gcc.zip,  zipper: 7z a -tzip, unzip: tar -xf 4.11.0.zip -C .,                                 copy: robocopy /E /COPYALL test_folder .\\build\\bin\\test_folder,          flags: -G "Unix Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++, extension: .exe }
         config:
         - { name: static, flags: -DBUILD_SHARED_LIBS=OFF }
         - { name: shared, flags: -DBUILD_SHARED_LIBS=ON  }
