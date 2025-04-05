@@ -67,7 +67,6 @@ jobs:
         cmake --build build --target install --config ${{ matrix.build.name }}
 
     - name: verify OpenCV installation
-      shell: bash
       run: tree ${{ matrix.opencv.folder_version }}/build/install
 
     - name: configure project
@@ -79,7 +78,6 @@ jobs:
       run: cmake --build build --config ${{ matrix.build.name }}
 
     - name: Display Build Tree
-      shell: bash
       run: tree build
 
     - name: create test folder

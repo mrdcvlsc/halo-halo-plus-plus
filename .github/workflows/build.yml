@@ -42,8 +42,8 @@ jobs:
     - name: Install MacOS Dependencies
       if: runner.os == 'macOS'
       run: |
-        brew update
-        brew upgrade
+        # brew update
+        # brew upgrade
         brew install tree
 
     - name: install linux ubuntu SFML dependencies

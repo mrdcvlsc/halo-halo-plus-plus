@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-        - { name: Windows-Clang,      os: windows-2022,   folder: .\\build\\bin\\,          zip: clang.zip,        zipper: 7z a -tzip, unzip: tar -xf 4.11.0.zip -C .,                                 copy: robocopy /E /COPYALL test_folder .\\build\\bin\\test_folder,          flags: -G "Visual Studio 17 2022" -A x64 -T ClangCL, extension: .exe }
+        - { name: Windows-Clang,      os: windows-latest,   folder: .\\build\\bin\\,          zip: clang.zip,        zipper: 7z a -tzip, unzip: tar -xf 4.11.0.zip -C .,                                 copy: robocopy /E /COPYALL test_folder .\\build\\bin\\test_folder,          flags: -G "Visual Studio 17 2022" -A x64 -T ClangCL, extension: .exe }
         config:
         - { name: static, flags: -DBUILD_SHARED_LIBS=OFF }
         - { name: shared, flags: -DBUILD_SHARED_LIBS=ON  }
@@ -67,7 +67,6 @@ jobs:
         cmake --build build --target install --config ${{ matrix.build.name }}
 
     - name: verify OpenCV installation
-      shell: bash
       run: tree ${{ matrix.opencv.folder_version }}/build/install
 
     - name: configure project
@@ -79,7 +78,6 @@ jobs:
       run: cmake --build build --config ${{ matrix.build.name }}
 
     - name: Display Build Tree
-      shell: bash
       run: tree build
 
     - name: create test folder
