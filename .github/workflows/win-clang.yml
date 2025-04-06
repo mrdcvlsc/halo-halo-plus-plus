@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-        - { name: Windows-Clang,      os: windows-2019,   folder: .\\build\\bin\\,          zip: clang.zip,        zipper: 7z a -tzip, unzip: tar -xf 4.11.0.zip -C .,                                 copy: robocopy /E /COPYALL test_folder .\\build\\bin\\test_folder,          flags: -G "Visual Studio 17 2022" -A x64 -T ClangCL, extension: .exe }
+        - { name: Windows-Clang,      os: windows-2019,   folder: .\\build\\bin\\,          zip: clang.zip,        zipper: 7z a -tzip, unzip: tar -xf 4.11.0.zip -C .,                                 copy: robocopy /E /COPYALL test_folder .\\build\\bin\\test_folder,          flags: -G "Visual Studio 16 2019" -A x64 -T ClangCL, extension: .exe }
         config:
         - { name: static, flags: -DBUILD_SHARED_LIBS=OFF }
         - { name: shared, flags: -DBUILD_SHARED_LIBS=ON  }

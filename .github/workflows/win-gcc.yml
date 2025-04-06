@@ -71,7 +71,7 @@ jobs:
 
     - name: configure project
       shell: bash
-      run: cmake -S . -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }} ${{ matrix.build.flags }} -DOpenCV_DIR="./${{ matrix.opencv.folder_version }}/build/install${{ matrix.platform.cmake_conf }}"
+      run: cmake -S . -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }} ${{ matrix.build.flags }} -DSFML_USE_MESA3D=ON -DOpenCV_DIR="./${{ matrix.opencv.folder_version }}/build/install${{ matrix.platform.cmake_conf }}"
 
     - name: Build ${{ matrix.platform.bin }} executable
       shell: bash
