@@ -45,6 +45,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: install ultralytics
+      shell: bash
       run: |
         python --version
         pip install ultralytics
@@ -70,7 +71,7 @@ jobs:
 
     - name: cmake Install OpenCV
       run: |
-        cd ${{ matrix.opencv.folder_version }}
+        cd ${{ matrix.opencv.folder_version }} 
         cmake --build build --target install --config ${{ matrix.build.name }}
 
     - name: verify OpenCV installation
@@ -98,6 +99,7 @@ jobs:
       run: make download-test-files
 
     - name: download ultralytics YOLOv11n model for testing
+      shell: bash
       run: python pt_to_torchscript.py
 
     - name: run test programs
