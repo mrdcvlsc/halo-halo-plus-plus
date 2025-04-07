@@ -52,7 +52,7 @@ jobs:
       shell: bash
       run: |
         cd ${{ matrix.opencv.folder_version }}
-        cmake -S . -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }} ${{ matrix.build.flags }} -DCPU_BASELINE=SSE3 -DCPU_DISPATCH=AVX,AVX2 -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DCMAKE_INSTALL_PREFIX="./build/install" -DBUILD_PERF_TESTS=OFF -DBUILD_TESTS=OFF -DBUILD_DOCS=OFF -DWITH_CUDA=OFF -DBUILD_EXAMPLES=OFF -DINSTALL_CREATE_DISTRIB=ON -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF -DOPENCV_FORCE_3RDPARTY_BUILD=ON
+        cmake -S . -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }} ${{ matrix.build.flags }} -DCPU_BASELINE=SSE2 -DCPU_DISPATCH= -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DCMAKE_INSTALL_PREFIX="./build/install" -DBUILD_PERF_TESTS=OFF -DBUILD_TESTS=OFF -DBUILD_DOCS=OFF -DWITH_CUDA=OFF -DBUILD_EXAMPLES=OFF -DINSTALL_CREATE_DISTRIB=ON -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF -DOPENCV_FORCE_3RDPARTY_BUILD=ON
     
     - name: cmake Build OpenCV
       shell: bash
