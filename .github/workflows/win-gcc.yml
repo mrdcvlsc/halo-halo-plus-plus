@@ -29,10 +29,20 @@ jobs:
         opencv:
         - { zip_version: 4.11.0.zip, folder_version: opencv-4.11.0  }
 
-    steps:
+    defaults:
+      run:
+        shell: msys2 {0}
 
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+    steps:
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: mingw64
+        update: true
+        install: >-
+          curl
+          git
+
+    - uses: actions/checkout@v4
 
     - name: install ultralytics
       run: |
@@ -49,19 +59,16 @@ jobs:
       run: git clone https://github.com/opencv/opencv_contrib.git
        
     - name: cmake config OpenCV
-      shell: bash
       run: |
         cd ${{ matrix.opencv.folder_version }}
         cmake -S . -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }} ${{ matrix.build.flags }} -DCPU_BASELINE=SSE3 -DCPU_DISPATCH=SSE4_1,SSE4_2,POPCNT,FP16,AVX,AVX2 -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DCMAKE_INSTALL_PREFIX="./build/install" -DBUILD_PERF_TESTS=OFF -DBUILD_TESTS=OFF -DBUILD_DOCS=OFF -DWITH_CUDA=OFF -DBUILD_EXAMPLES=OFF -DINSTALL_CREATE_DISTRIB=ON -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF -DOPENCV_FORCE_3RDPARTY_BUILD=ON
     
     - name: cmake Build OpenCV
-      shell: bash
       run: |
         cd ${{ matrix.opencv.folder_version }}
         cmake --build build --config ${{ matrix.build.name }}
 
     - name: cmake Install OpenCV
-      shell: bash
       run: |
         cd ${{ matrix.opencv.folder_version }}
         cmake --build build --target install --config ${{ matrix.build.name }}
@@ -69,12 +76,15 @@ jobs:
     - name: verify OpenCV installation
       run: tree ${{ matrix.opencv.folder_version }}/build/install
 
+    - name: GCC Version
+      run: |
+        gcc --version
+        g++ --version
+
     - name: configure project
-      shell: bash
       run: cmake -S . -B build ${{ matrix.platform.flags }} ${{ matrix.config.flags }} ${{ matrix.build.flags }} -DSFML_USE_MESA3D=ON -DOpenCV_DIR="./${{ matrix.opencv.folder_version }}/build/install${{ matrix.platform.cmake_conf }}"
 
     - name: Build ${{ matrix.platform.bin }} executable
-      shell: bash
       run: cmake --build build --config ${{ matrix.build.name }}
 
     - name: Display Build Tree
@@ -85,14 +95,12 @@ jobs:
       run: mkdir test_folder
       
     - name: download test files
-      shell: bash
       run: make download-test-files
 
     - name: download ultralytics YOLOv11n model for testing
       run: python pt_to_torchscript.py
 
     - name: run test programs
-      shell: bash
       run: make test EXECUTABLE=${{ matrix.platform.folder }}${{ matrix.platform.bin }}draw_bounding_box${{ matrix.platform.extension }}
 
     - name: copy test folder to bin directory
