@@ -11,9 +11,11 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_STANDARD 17)
 
 if(NOT BUILD_SHARED_LIBS)
+    set(OpenCV_STATIC_LIBRARIES ON)
     set(OpenCV_STATIC ON)
     set(OpenCV_SHARED OFF)
 else()
+    set(OpenCV_STATIC_LIBRARIES OFF)
     set(OpenCV_STATIC OFF)
     set(OpenCV_SHARED ON)
 endif()
@@ -193,13 +195,18 @@ endif (MSVC)
 if (BUILD_SHARED_LIBS)
     file(GLOB OPENCV_BIN_DLL   "${OpenCV_INSTALL_PATH}/bin/*.dll")
     file(GLOB OPENCV_BIN_SO    "${OpenCV_INSTALL_PATH}/bin/*.so")
+    file(GLOB OPENCV_BIN_LIB   "${OpenCV_INSTALL_PATH}/bin/*.lib")
     file(GLOB OPENCV_LIB_DLL   "${OpenCV_INSTALL_PATH}/lib/*.dll")
     file(GLOB OPENCV_LIB_SO    "${OpenCV_INSTALL_PATH}/lib/*.so")
     file(GLOB OPENCV_LIB_DYLIB "${OpenCV_INSTALL_PATH}/lib/*.dylib")
+    file(GLOB OPENCV_LIB_LIB   "${OpenCV_INSTALL_PATH}/lib/*.lib")
 
     list(APPEND OPENCV_BIN_DLL ${OPENCV_BIN_SO})
+    list(APPEND OPENCV_BIN_DLL ${OPENCV_BIN_LIB})
     list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_DLL})
     list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_SO})
+    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_DYLIB})
+    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_LIB})
 
     add_custom_command(TARGET live_cam_object_detection
         POST_BUILD
@@ -242,13 +249,18 @@ set_property(TARGET live_cam_motion_detection PROPERTY CXX_STANDARD 17)
 if (BUILD_SHARED_LIBS)
     file(GLOB OPENCV_BIN_DLL   "${OpenCV_INSTALL_PATH}/bin/*.dll")
     file(GLOB OPENCV_BIN_SO    "${OpenCV_INSTALL_PATH}/bin/*.so")
+    file(GLOB OPENCV_BIN_LIB   "${OpenCV_INSTALL_PATH}/bin/*.lib")
     file(GLOB OPENCV_LIB_DLL   "${OpenCV_INSTALL_PATH}/lib/*.dll")
     file(GLOB OPENCV_LIB_SO    "${OpenCV_INSTALL_PATH}/lib/*.so")
     file(GLOB OPENCV_LIB_DYLIB "${OpenCV_INSTALL_PATH}/lib/*.dylib")
+    file(GLOB OPENCV_LIB_LIB   "${OpenCV_INSTALL_PATH}/lib/*.lib")
 
     list(APPEND OPENCV_BIN_DLL ${OPENCV_BIN_SO})
+    list(APPEND OPENCV_BIN_DLL ${OPENCV_BIN_LIB})
     list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_DLL})
     list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_SO})
+    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_DYLIB})
+    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_LIB})
     
     add_custom_command(TARGET live_cam_motion_detection
         POST_BUILD
@@ -290,13 +302,18 @@ endif (MSVC)
 if (BUILD_SHARED_LIBS)
     file(GLOB OPENCV_BIN_DLL   "${OpenCV_INSTALL_PATH}/bin/*.dll")
     file(GLOB OPENCV_BIN_SO    "${OpenCV_INSTALL_PATH}/bin/*.so")
+    file(GLOB OPENCV_BIN_LIB   "${OpenCV_INSTALL_PATH}/bin/*.lib")
     file(GLOB OPENCV_LIB_DLL   "${OpenCV_INSTALL_PATH}/lib/*.dll")
     file(GLOB OPENCV_LIB_SO    "${OpenCV_INSTALL_PATH}/lib/*.so")
     file(GLOB OPENCV_LIB_DYLIB "${OpenCV_INSTALL_PATH}/lib/*.dylib")
+    file(GLOB OPENCV_LIB_LIB   "${OpenCV_INSTALL_PATH}/lib/*.lib")
 
     list(APPEND OPENCV_BIN_DLL ${OPENCV_BIN_SO})
+    list(APPEND OPENCV_BIN_DLL ${OPENCV_BIN_LIB})
     list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_DLL})
     list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_SO})
+    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_DYLIB})
+    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_LIB})
     
     add_custom_command(TARGET draw_bounding_box
         POST_BUILD
