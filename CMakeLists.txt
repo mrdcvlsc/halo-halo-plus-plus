@@ -193,7 +193,8 @@ if (MSVC)
 endif (MSVC)
 
 if (BUILD_SHARED_LIBS)
-    file(GLOB OPENCV_BIN_DLL   "${OpenCV_INSTALL_PATH}/bin/*.dll")
+    file(GLOB ALL_PROJECT_SHARED_LIBS   "${OpenCV_INSTALL_PATH}/bin/*.dll")
+
     file(GLOB OPENCV_BIN_SO    "${OpenCV_INSTALL_PATH}/bin/*.so")
     file(GLOB OPENCV_BIN_LIB   "${OpenCV_INSTALL_PATH}/bin/*.lib")
     file(GLOB OPENCV_LIB_DLL   "${OpenCV_INSTALL_PATH}/lib/*.dll")
@@ -201,17 +202,28 @@ if (BUILD_SHARED_LIBS)
     file(GLOB OPENCV_LIB_DYLIB "${OpenCV_INSTALL_PATH}/lib/*.dylib")
     file(GLOB OPENCV_LIB_LIB   "${OpenCV_INSTALL_PATH}/lib/*.lib")
 
-    list(APPEND OPENCV_BIN_DLL ${OPENCV_BIN_SO})
-    list(APPEND OPENCV_BIN_DLL ${OPENCV_BIN_LIB})
-    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_DLL})
-    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_SO})
-    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_DYLIB})
-    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_LIB})
+    file(GLOB TORCH_LIB_DYLIBS "_deps/torch-src/lib/*.dylib")
+    file(GLOB TORCH_LIB_LIBS "_deps/torch-src/lib/*.lib")
+    file(GLOB TORCH_LIB_DLL "_deps/torch-src/lib/*.dll")
+    file(GLOB TORCH_LIB_SO "_deps/torch-src/lib/*.so")
+
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${OPENCV_BIN_SO})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${OPENCV_BIN_LIB})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${OPENCV_LIB_DLL})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${OPENCV_LIB_SO})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${OPENCV_LIB_DYLIB})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${OPENCV_LIB_LIB})
+
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${TORCH_LIB_DYLIBS})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${TORCH_LIB_LIBS})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${TORCH_LIB_DLL})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${TORCH_LIB_SO})
+
 
     add_custom_command(TARGET live_cam_object_detection
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${OPENCV_BIN_DLL}
+        ${ALL_PROJECT_SHARED_LIBS}
         $<TARGET_FILE_DIR:live_cam_object_detection>
     )
 endif()
@@ -247,7 +259,8 @@ set_property(TARGET live_cam_motion_detection PROPERTY CXX_STANDARD 17)
 # endif (MSVC)
 
 if (BUILD_SHARED_LIBS)
-    file(GLOB OPENCV_BIN_DLL   "${OpenCV_INSTALL_PATH}/bin/*.dll")
+    file(GLOB ALL_PROJECT_SHARED_LIBS   "${OpenCV_INSTALL_PATH}/bin/*.dll")
+    
     file(GLOB OPENCV_BIN_SO    "${OpenCV_INSTALL_PATH}/bin/*.so")
     file(GLOB OPENCV_BIN_LIB   "${OpenCV_INSTALL_PATH}/bin/*.lib")
     file(GLOB OPENCV_LIB_DLL   "${OpenCV_INSTALL_PATH}/lib/*.dll")
@@ -255,17 +268,27 @@ if (BUILD_SHARED_LIBS)
     file(GLOB OPENCV_LIB_DYLIB "${OpenCV_INSTALL_PATH}/lib/*.dylib")
     file(GLOB OPENCV_LIB_LIB   "${OpenCV_INSTALL_PATH}/lib/*.lib")
 
-    list(APPEND OPENCV_BIN_DLL ${OPENCV_BIN_SO})
-    list(APPEND OPENCV_BIN_DLL ${OPENCV_BIN_LIB})
-    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_DLL})
-    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_SO})
-    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_DYLIB})
-    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_LIB})
+    file(GLOB TORCH_LIB_DYLIBS "_deps/torch-src/lib/*.dylib")
+    file(GLOB TORCH_LIB_LIBS "_deps/torch-src/lib/*.lib")
+    file(GLOB TORCH_LIB_DLL "_deps/torch-src/lib/*.dll")
+    file(GLOB TORCH_LIB_SO "_deps/torch-src/lib/*.so")
+
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${OPENCV_BIN_SO})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${OPENCV_BIN_LIB})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${OPENCV_LIB_DLL})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${OPENCV_LIB_SO})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${OPENCV_LIB_DYLIB})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${OPENCV_LIB_LIB})
+
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${TORCH_LIB_DYLIBS})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${TORCH_LIB_LIBS})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${TORCH_LIB_DLL})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${TORCH_LIB_SO})
     
     add_custom_command(TARGET live_cam_motion_detection
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${OPENCV_BIN_DLL}
+        ${ALL_PROJECT_SHARED_LIBS}
         $<TARGET_FILE_DIR:live_cam_motion_detection>
     )
 endif()
@@ -300,7 +323,8 @@ if (MSVC)
 endif (MSVC)
 
 if (BUILD_SHARED_LIBS)
-    file(GLOB OPENCV_BIN_DLL   "${OpenCV_INSTALL_PATH}/bin/*.dll")
+    file(GLOB ALL_PROJECT_SHARED_LIBS   "${OpenCV_INSTALL_PATH}/bin/*.dll")
+        
     file(GLOB OPENCV_BIN_SO    "${OpenCV_INSTALL_PATH}/bin/*.so")
     file(GLOB OPENCV_BIN_LIB   "${OpenCV_INSTALL_PATH}/bin/*.lib")
     file(GLOB OPENCV_LIB_DLL   "${OpenCV_INSTALL_PATH}/lib/*.dll")
@@ -308,17 +332,27 @@ if (BUILD_SHARED_LIBS)
     file(GLOB OPENCV_LIB_DYLIB "${OpenCV_INSTALL_PATH}/lib/*.dylib")
     file(GLOB OPENCV_LIB_LIB   "${OpenCV_INSTALL_PATH}/lib/*.lib")
 
-    list(APPEND OPENCV_BIN_DLL ${OPENCV_BIN_SO})
-    list(APPEND OPENCV_BIN_DLL ${OPENCV_BIN_LIB})
-    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_DLL})
-    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_SO})
-    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_DYLIB})
-    list(APPEND OPENCV_BIN_DLL ${OPENCV_LIB_LIB})
+    file(GLOB TORCH_LIB_DYLIBS "_deps/torch-src/lib/*.dylib")
+    file(GLOB TORCH_LIB_LIBS "_deps/torch-src/lib/*.lib")
+    file(GLOB TORCH_LIB_DLL "_deps/torch-src/lib/*.dll")
+    file(GLOB TORCH_LIB_SO "_deps/torch-src/lib/*.so")
+
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${OPENCV_BIN_SO})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${OPENCV_BIN_LIB})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${OPENCV_LIB_DLL})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${OPENCV_LIB_SO})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${OPENCV_LIB_DYLIB})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${OPENCV_LIB_LIB})
+
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${TORCH_LIB_DYLIBS})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${TORCH_LIB_LIBS})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${TORCH_LIB_DLL})
+    list(APPEND ALL_PROJECT_SHARED_LIBS ${TORCH_LIB_SO})
     
     add_custom_command(TARGET draw_bounding_box
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${OPENCV_BIN_DLL}
+        ${ALL_PROJECT_SHARED_LIBS}
         $<TARGET_FILE_DIR:draw_bounding_box>
     )
 endif()
