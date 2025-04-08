@@ -121,7 +121,7 @@ jobs:
     - name: run test programs
       shell: bash
       env:
-        DYLD_LIBRARY_PATH: ./opencv-4.11.0/build/install/lib/
+        DYLD_LIBRARY_PATH: ${{ matrix.platform.folder }}
       run: make test EXECUTABLE=${{ matrix.platform.folder }}${{ matrix.platform.bin }}draw_bounding_box${{ matrix.platform.extension }}
 
     - name: copy test folder to bin directory
