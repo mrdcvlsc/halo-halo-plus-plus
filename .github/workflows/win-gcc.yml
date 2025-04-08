@@ -54,6 +54,7 @@ jobs:
       run: curl -L -o ${{ matrix.opencv.zip_version }} https://github.com/opencv/opencv/archive/refs/tags/${{ matrix.opencv.zip_version }}
 
     - name: extract OpenCV sources
+      shell: cmd
       run: ${{ matrix.platform.unzip }}
 
     - name: clone OpenCV-Contrib
@@ -134,15 +135,18 @@ jobs:
         exit 0
 
     - name: compress ${{ matrix.platform.folder }} bin folder
+      shell: cmd
       run: ${{ matrix.platform.zipper }} ${{ matrix.config.name }}-${{ matrix.platform.os }}-${{ matrix.platform.zip }} ${{ matrix.platform.folder }}
 
     - name: create github release and upload ${{ matrix.config.name }}-${{ matrix.platform.os }}-${{ matrix.platform.zip }}
+      shell: cmd
       continue-on-error: true
       run: gh release create ${{ github.ref_name }} ${{ matrix.config.name }}-${{ matrix.platform.os }}-${{ matrix.platform.zip }} --title "${{ github.ref_name }}" --notes "Release notes for ${{ github.ref_name }}" --draft=false --prerelease=false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Upload ${{ matrix.config.name }}-${{ matrix.platform.os }}-${{ matrix.platform.zip }} to release
+      shell: cmd
       continue-on-error: true
       run: gh release upload ${{github.ref_name}} ${{ matrix.config.name }}-${{ matrix.platform.os }}-${{ matrix.platform.zip }}
       env:
