@@ -54,3 +54,8 @@ docs/*.mp4
 *.app
 
 build
+
+# opencv atrifacts
+4.13.0.zip
+opencv-4.13.0
+opencv_contrib

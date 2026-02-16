@@ -29,8 +29,7 @@ sudo apt install libxrandr-dev libxcursor-dev libxi-dev \
 # install opencv
 sudo apt install libopencv-dev
 
-# clone and open this project
-cd sfml-opencv-libtorch
+# clone and open this project in the terminal/cli
 
 # configure
 cmake -S . -B build -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DBUILD_SHARED_LIBS=FALSE -DCMAKE_BUILD_TYPE=Release
@@ -45,8 +44,7 @@ cmake --build build --config Release -j2
 # install opencv
 brew install opencv
 
-# clone and open this project
-cd sfml-opencv-libtorch
+# clone and open this project in the terminal/cli
 
 # configure
 cmake -S . -B build -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DBUILD_SHARED_LIBS=FALSE -DCMAKE_BUILD_TYPE=Release
@@ -55,34 +53,40 @@ cmake -S . -B build -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DBUIL
 cmake --build build --config Release -j2
 ```
 
-# Windows MSVC visual studio 16
+# Windows MSVC (CLI)
 
 Use `-G "Visual Studio 17 2022" -A x64` for visual studio 17.
 
-Use `-G "Visual Studio 18 2025" -A x64` for visual studio 18 (maybe?).
+Use `-G "Visual Studio 18 2026" -A x64` for visual studio 18 (cmake 4.2^).
 
 First open cmd and follow the commands below:
 
 ```bash
-# clone and open this project
-cd sfml-opencv-libtorch
+# clone and open this project in the terminal/cli
 
-# download cmake source
-curl -L -o 4.11.0.zip https://github.com/opencv/opencv/archive/refs/tags/4.11.0.zip
+# download opencv source
+curl -L -o 4.13.0.zip https://github.com/opencv/opencv/archive/refs/tags/4.13.0.zip
 
-# extract cmake source
-tar -xf "4.11.0.zip" -C ".\\"
+# extract opencv source
+tar -xf "4.13.0.zip" -C ".\\"
+
+# clone opencv contrib
+git clone https://github.com/opencv/opencv_contrib.git
 
 # go to OpenCV source directory
-cd opencv-4.11.0
+cd opencv-4.13.0
 
 # configure OpenCV (see above for other generators of MSVC)
 cmake -S . -B build ^
-    -G "Visual Studio 16 2019" -A x64 ^
-    -DBUILD_SHARED_LIBS=FALSE -DCMAKE_BUILD_TYPE=Release ^
-    -DCMAKE_INSTALL_PREFIX="build/install" -DBUILD_PERF_TESTS=OFF ^
+    -G "Visual Studio 18 2026" -A x64 ^
+    -DCMAKE_INSTALL_PREFIX="build/install" ^
+    -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" ^
+    -DCMAKE_BUILD_TYPE=Release ^
+    -DBUILD_SHARED_LIBS=FALSE ^
+    -DBUILD_PERF_TESTS=OFF ^
     -DBUILD_TESTS=OFF -DBUILD_DOCS=OFF -DWITH_CUDA=OFF ^
-    -DBUILD_EXAMPLES=OFF -DINSTALL_CREATE_DISTRIB=ON
+    -DBUILD_EXAMPLES=OFF -DINSTALL_CREATE_DISTRIB=ON ^
+    -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF -DOPENCV_FORCE_3RDPARTY_BUILD=ON
 
 # build compile OpenCV
 cmake --build build --config Release -j2
@@ -95,9 +99,10 @@ cmake --build build --target install --config Release
 cd ..
 
 # configure sfml-opencv-libtorch project
-cmake -S . -B build -DOpenCV_DIR="opencv-4.11.0/build/install" ^
-    -G "Visual Studio 16 2019" -A x64 ^
-    -DBUILD_SHARED_LIBS=FALSE -DCMAKE_BUILD_TYPE=Release
+cmake -S . -B build -DOpenCV_DIR="opencv-4.13.0/build/install" ^
+    -G "Visual Studio 18 2026" -A x64 ^
+    -DBUILD_SHARED_LIBS=FALSE -DCMAKE_BUILD_TYPE=Release ^
+    -DOpenCV_DIR="./opencv-4.13.0/build/install"
 
 # build compile sfml-opencv-libtorch
 cmake --build build --config Release -j2
@@ -108,17 +113,16 @@ cmake --build build --config Release -j2
 # Windows GCC or Clang
 
 ```bash
-# clone and open this project
-cd sfml-opencv-libtorch
+# clone and open this project in the terminal/cli
 
 # download cmake source
-curl -L -o 4.11.0.zip https://github.com/opencv/opencv/archive/refs/tags/4.11.0.zip
+curl -L -o 4.13.0.zip https://github.com/opencv/opencv/archive/refs/tags/4.13.0.zip
 
 # extract cmake source
-tar -xf "4.11.0.zip" -C ".\\"
+tar -xf "4.13.0.zip" -C ".\\"
 
 # go to OpenCV source directory
-cd opencv-4.11.0
+cd opencv-4.13.0
 
 # configure OpenCV (see above for other generators of MSVC)
 cmake -S . -B build ^
@@ -141,7 +145,7 @@ cmake --build build --target install --config Release
 cd ..
 
 # configure sfml-opencv-libtorch project
-cmake -S . -B build -DOpenCV_DIR="opencv-4.11.0/build/install" ^
+cmake -S . -B build -DOpenCV_DIR="opencv-4.13.0/build/install" ^
     -G -G "Unix Makefiles" ^
     -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ ^
     -DCPU_BASELINE=SSE3 -DCPU_DISPATCH= ^ # (optional, clang might need this line)
