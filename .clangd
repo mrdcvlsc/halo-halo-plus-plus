@@ -9,7 +9,7 @@ Diagnostics:
 
 CompileFlags:
   Add: [
-    -std=c++20,
+    -std=c++17,
     -I./opencv-4.13.0/build/install/include,
     -I./build/_deps/sfml-src/include,
     -I./build/_deps/torch-src/include,
