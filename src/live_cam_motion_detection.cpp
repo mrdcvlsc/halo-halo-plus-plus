@@ -180,6 +180,7 @@ int main(int argc, char **argv)
             std::cout << "motion detected\n";
 
             std::string motion_frame_img = get_timestamp() + ".jpg";
+            motion_frame_img.erase(std::remove_if(motion_frame_img.begin(), motion_frame_img.end(), ::isspace), motion_frame_img.end());
 
             if (!cv::imwrite(motion_frame_img, frame)) {
                 std::cerr << "failed to save output image to " << motion_frame_img << "\n";

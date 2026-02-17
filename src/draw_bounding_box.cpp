@@ -1,7 +1,6 @@
 #include <ATen/ATen.h>
 #include <ATen/Parallel.h>
 #include <chrono>
-#include <cmath>
 #include <cstdlib>
 #include <iostream>
 #include <vector>
@@ -255,6 +254,8 @@ int main(int argc, char **argv)
 
         label.resize(0);
     }
+
+    output_img_path.erase(std::remove_if(output_img_path.begin(), output_img_path.end(), ::isspace), output_img_path.end());
 
     if (!cv::imwrite(output_img_path, origin_img)) {
         std::cerr << "failed to save output image to " << output_img_path << "\n";
