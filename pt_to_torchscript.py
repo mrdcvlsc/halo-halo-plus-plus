@@ -21,8 +21,34 @@ def convert_to_torchscript(model_info):
     model.export(format="torchscript", optimize=True, device='cpu', imgsz=model_info['input'])
 
 
+def convert_to_onnx(model_info):
+    model = YOLO(model_info['name'])
+    print('model name :', model.model_name)
+    model = model.to("cpu")
+    model.eval()
+    # Try common export options; different ultralytics versions accept different args.
+    # We attempt the most-featured call first, then fall back if a TypeError occurs.
+    tried = False
+    try:
+        model.export(format="onnx", optimize=True, simplify=True, device='cpu', imgsz=model_info['input'], opset=16)
+        tried = True
+    except TypeError:
+        pass
+
+    if not tried:
+        try:
+            model.export(format="onnx", optimize=True, device='cpu', imgsz=model_info['input'], opset=16)
+            tried = True
+        except TypeError:
+            pass
+
+    if not tried:
+        # Last-resort: call with minimal args
+        model.export(format="onnx", device='cpu', imgsz=model_info['input'], opset=16)
+
 for model in models:
     print('====================================================')
     print(model)
     convert_to_torchscript(model)
+    convert_to_onnx(model)
     print('====================================================')
