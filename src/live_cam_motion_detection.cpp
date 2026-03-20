@@ -24,7 +24,7 @@ int main(int argc, char **argv)
     // my env best args : ./build/bin/live_cam_motion_detection 100 200 1000 837
     if (argc < 1 + 4) {
         std::cerr
-          << "Args: " << argv[0]
+          << "Args: " << argv[0] << " "
           << "[history:recommend=200] [sensitivity_threshold:recommend=16] "
              "[min_area:recommend=150] [flip: -1, 0, 1, others]\n\n\n"
              "history               - number of frames to learn background\n"
@@ -52,25 +52,25 @@ int main(int argc, char **argv)
 
         history = std::strtol(argv[1], &err_ptr, 10);
         if (*err_ptr != '\0') {
-            std::cerr << "invalid argument 1 (history) value, not a number\n";
+            std::cerr << "invalid 1st argument (history) value, not a number\n";
             return 1;
         }
 
         sensitivity_threshold = std::strtol(argv[2], &err_ptr, 10);
         if (*err_ptr != '\0') {
-            std::cerr << "invalid argument 2 (sensitivity_threshold) value, not a number\n";
+            std::cerr << "invalid 2nd argument (sensitivity_threshold) value, not a number\n";
             return 1;
         }
 
         min_area = std::strtol(argv[3], &err_ptr, 10);
         if (*err_ptr != '\0') {
-            std::cerr << "invalid argument 3 (min_area) value, not a number\n";
+            std::cerr << "invalid 3rd argument (min_area) value, not a number\n";
             return 1;
         }
 
         flip_value = std::strtol(argv[4], &err_ptr, 10);
         if (*err_ptr != '\0') {
-            std::cerr << "invalid argument 4 (flip_value) value, not a number\n";
+            std::cerr << "invalid 4th argument (flip_value) value, not a number\n";
             return 1;
         }
     }
@@ -181,6 +181,8 @@ int main(int argc, char **argv)
 
             std::string motion_frame_img = get_timestamp() + ".jpg";
             motion_frame_img.erase(std::remove_if(motion_frame_img.begin(), motion_frame_img.end(), ::isspace), motion_frame_img.end());
+            
+            std::replace(motion_frame_img.begin(), motion_frame_img.end(), ':', '-');
 
             if (!cv::imwrite(motion_frame_img, frame)) {
                 std::cerr << "failed to save output image to " << motion_frame_img << "\n";
